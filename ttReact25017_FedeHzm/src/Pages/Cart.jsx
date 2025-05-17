@@ -5,7 +5,7 @@ import withReactContent from "sweetalert2-react-content";
 
 function Cart({ cartItems, setCartItems }) {
     const MySwal = withReactContent(Swal);
-    // Función para eliminar un producto del carrito
+
     const removeFromCart = (itemId) => {
         MySwal.fire({
             title: "¿Estás seguro?",

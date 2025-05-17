@@ -6,6 +6,7 @@ import withReactContent from "sweetalert2-react-content";
 function Catalogue({setCartItems, cartItems}) {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const MySwal = withReactContent(Swal);
     //Load items from FakeStoreAPI
     const addToCart = (item) => {
@@ -35,12 +36,22 @@ function Catalogue({setCartItems, cartItems}) {
             })
             .catch((error) => {
                 console.error("Error fetching items:", error);
+                setError("Error fetching items: ", error);
                 setLoading(false);
             });
     }, []);
 
     if (loading) {
         return <div className="text-center">Cargando...</div>;
+    }
+    
+    if (error) {
+        return (
+            <div className="text-center">
+                <h2 className="text-danger">Error</h2>
+                <p>{error}</p>
+            </div>
+        );
     }
 
     return (

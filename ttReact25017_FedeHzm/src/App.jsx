@@ -1,16 +1,17 @@
-import Container from 'react-bootstrap/Container';
-import 'bootstrap/dist/css/bootstrap.min.css';  
+import { BrowserRouter as Router,Route,Routes } from 'react-router-dom';
+import { useState } from 'react';  
 import Home from './Pages/Home';
 import Catalogue from './Pages/Catalogue';
 import Cart from './Pages/Cart';
+import Login from './Pages/Login';
+import Admin from './Pages/Admin';
 import Header from './Components/Header';
 import NavBar from './Components/NavBar';
 import Footer from './Components/Footer';
-import { BrowserRouter as Router,Route,Routes } from 'react-router-dom';
-import { useState } from 'react';
-import ProtectedRoute from './Components/ProtectedRoute';
-import Login from './Pages/Login';
-import Admin from './Pages/Admin';
+import ProtectedAdminRoute from './Components/ProtectedAdminRoute';
+import ProtectedUserRoute from './Components/ProtectedUserRoute';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 function App() {
   const [cartItems, setCartItems] = useState([]);
 
@@ -24,16 +25,16 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/Catalogue" element={<Catalogue cartItems={cartItems} setCartItems={setCartItems}/>} />
             <Route path="/Cart" element={
-              <ProtectedRoute isAuthenticated> 
+              <ProtectedUserRoute> 
                 <Cart cartItems={cartItems} setCartItems={setCartItems}/>
-              </ProtectedRoute>
+              </ProtectedUserRoute>
               }
             />
             <Route path="/Login" element={<Login />} /> 
             <Route path="/Admin/:name" element={
-              <ProtectedRoute > 
+              <ProtectedAdminRoute> 
                 <Admin/>
-              </ProtectedRoute>
+              </ProtectedAdminRoute>
               }
             /> 
           </Routes>

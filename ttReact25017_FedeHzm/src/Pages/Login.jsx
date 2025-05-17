@@ -17,12 +17,15 @@ function Login() {
         e.preventDefault();
         const username = e.target.username.value;
         const password = e.target.password.value;
-
         // Simulate authentication
         if (username === "admin" && password === "admin") {
-            localStorage.setItem("isAuthenticated", true);
             handleLogin();
+            localStorage.setItem("isAdmin", true);
             navigate("/Admin/peperro");
+        } else if (username === "user" && password === "user") {
+            handleLogin();
+            localStorage.setItem("isAdmin", false);
+            navigate("/");
         } else {
             const MySwal = withReactContent(Swal);
             MySwal.fire({

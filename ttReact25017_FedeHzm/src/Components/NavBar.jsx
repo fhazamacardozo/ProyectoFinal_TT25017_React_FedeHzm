@@ -9,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 function NavBar() {
     const navigate = useNavigate();
     const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
     const handleLogout = () => {
         localStorage.removeItem("isAuthenticated");
         navigate("/Login");
@@ -25,7 +26,9 @@ function NavBar() {
                         {isAuthenticated && (
                             <>
                                 <Nav.Link as={Link} to="/Cart">Cart</Nav.Link>
-                                <Nav.Link as={Link} to="/Admin/peperro">Admin</Nav.Link>
+                                {isAdmin && (
+                                    <Nav.Link as={Link} to="/Admin/pepe">Admin</Nav.Link>
+                                )}
                             </>
                         )}
                         <Nav>

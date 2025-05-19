@@ -16,7 +16,7 @@ function App() {
   const [cartItems, setCartItems] = useState([]);
 
   return (
-    <Router>
+    <Router basename="/ProyectoFinal_TT25017_React_FedeHzm/">
       <div className='d-flex flex-column min-vh-100'>
         <Header user="Pepito" type="Admin"/>
         <NavBar />

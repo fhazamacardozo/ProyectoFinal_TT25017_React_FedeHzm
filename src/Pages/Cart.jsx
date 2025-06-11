@@ -1,62 +1,18 @@
 import { Container, Table } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
+import { useContext } from "react";
+import { CartContext } from "../Context/CartContext";
 
-function Cart({ cartItems, setCartItems }) {
-    const MySwal = withReactContent(Swal);
-
-    const removeFromCart = (itemId) => {
-        MySwal.fire({
-            title: "¿Estás seguro?",
-            text: "No podrás revertir esto!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Sí, eliminar!",
-            cancelButtonText: "Cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                setCartItems(cartItems.filter(item => item.id !== itemId));
-                const removedItem = cartItems.find(item => item.id === itemId); 
-                if (removedItem) {
-                    MySwal.fire({
-                        title: "Producto eliminado del carrito",
-                        text: `${removedItem.title} ha sido eliminado de tu carrito.`,
-                        icon: "success",
-                        confirmButtonText: "Aceptar",
-                        confirmButtonColor: "#3085d6"
-                    });
-                }
-            }
-        });
-    };
-
-    const clearCart = () => {
-        MySwal.fire({
-            title: "¿Estás seguro?",
-            text: "No podrás revertir esto!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Sí, vaciar carrito!",
-            cancelButtonText: "Cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                setCartItems([]);;
-            }
-        });
-    };
+function Cart() {
+    const {cartItems = [], removeFromCart, clearCart, calculateTotal} = useContext(CartContext);
     if (cartItems.length === 0) {
         return (
             <Container className="py-5">
-                <h2 className="text-info text-center">Tu carrito está vacío</h2>
+                <h2 className="text-info mb-4">Tu Carrito de Compras</h2>
+                <p>No hay productos en tu carrito.</p>
             </Container>
         );
     }
-
     return (
         <Container className="py-5">
             <h2 className="text-info mb-4">Tu Carrito de Compras</h2>
@@ -97,8 +53,5 @@ function Cart({ cartItems, setCartItems }) {
     );
 };
 // Función para calcular el total del carrito
-const calculateTotal = (items) => {
-    return items.reduce((total, item) => total + item.price * item.quantity, 0);
-};
 
 export default Cart;

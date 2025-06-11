@@ -3,30 +3,16 @@ import { Container } from "react-bootstrap";
 import CardList from "../Components/CardList";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-function Catalogue({setCartItems, cartItems}) {
+import { CartContext } from "../Context/CartContext";
+import { useContext } from "react";
+function Catalogue() {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const MySwal = withReactContent(Swal);
+    const { addToCart } = useContext(CartContext);
     //Load items from FakeStoreAPI
-    const addToCart = (item) => {
-        const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
-        if (existingItem) {
-        setCartItems(cartItems.map(cartItem =>
-            cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        ));
-        } 
-        else {
-        setCartItems([...cartItems, { ...item, quantity: 1 }]);
-        }
-        MySwal.fire({
-            title: "Producto agregado al carrito",
-            text: `${item.title} ha sido agregado a tu carrito.`,
-            icon: "success",
-        });
-    };
+
     useEffect(() => {
         fetch("https://fakestoreapi.com/products")
             .then((response) => response.json())

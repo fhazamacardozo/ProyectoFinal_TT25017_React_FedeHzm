@@ -1,5 +1,4 @@
 import { BrowserRouter as Router,Route,Routes } from 'react-router-dom';
-import { useState } from 'react';  
 import Home from './Pages/Home';
 import Catalogue from './Pages/Catalogue';
 import Cart from './Pages/Cart';
@@ -13,7 +12,6 @@ import ProtectedUserRoute from './Components/ProtectedUserRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
-  const [cartItems, setCartItems] = useState([]);
 
   return (
     <Router basename="/ProyectoFinal_TT25017_React_FedeHzm/">
@@ -23,10 +21,10 @@ function App() {
         <main className="flex-grow-1">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/Catalogue" element={<Catalogue cartItems={cartItems} setCartItems={setCartItems}/>} />
+            <Route path="/Catalogue" element={<Catalogue/>} />
             <Route path="/Cart" element={
               <ProtectedUserRoute> 
-                <Cart cartItems={cartItems} setCartItems={setCartItems}/>
+                <Cart/>
               </ProtectedUserRoute>
               }
             />

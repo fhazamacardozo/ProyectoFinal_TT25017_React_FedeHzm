@@ -33,8 +33,7 @@
 .card h6 {   
     font-size: 0.95rem;
     line-height: 1.2;
-    /* Make the title take up available space vertically */
-    flex-grow: 1; /* Allow h6 to grow and push subsequent content down */
+    flex-grow: 1; 
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;

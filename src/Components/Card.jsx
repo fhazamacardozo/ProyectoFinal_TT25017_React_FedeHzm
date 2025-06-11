@@ -4,7 +4,7 @@ import Button from "./Button";
 function Card({ item, buttonText, onClick_ }) {
     return (
         <div className="card" key={item.id}>
-            <div className="image-container"> {/* New container for the image */}
+            <div className="image-container">
                 <img src={item.image} alt={item.title} />
             </div>
             <h6>{item.title}</h6>
@@ -13,8 +13,8 @@ function Card({ item, buttonText, onClick_ }) {
             <p className="rating" >Rating: {item.rating.rate} ({item.rating.count})</p>
             {buttonText && (
                 <Button
-                    text={buttonText}
-                    onClick={onClick_}
+                    text={buttonText} 
+                    onClick={onClick_} 
                 />
             )}
         </div>

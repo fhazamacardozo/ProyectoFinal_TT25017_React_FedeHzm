@@ -4,9 +4,10 @@ import Button from "./Button";
 function Card({ item, buttonText, onClick_ }) {
     return (
         <div className="card" key={item.id}>
-            <img src={item.image} alt={item.title} />
-            <h2>{item.title}</h2>
-            <p>{item.description}</p>
+            <div className="image-container"> {/* New container for the image */}
+                <img src={item.image} alt={item.title} />
+            </div>
+            <h6>{item.title}</h6>
             <p className="price">${item.price}</p>
             <p className="category">{item.category}</p>
             <p className="rating" >Rating: {item.rating.rate} ({item.rating.count})</p>

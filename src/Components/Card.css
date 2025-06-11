@@ -6,11 +6,57 @@
     text-align: center;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: normal; 
+}
+
+.card .image-container {
+    width: 100%;
+    padding-bottom: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px;
+
 }
 
 .card img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
+    object-fit: contain;
     border-radius: 5px;
+}
+
+.card h6 {   
+    font-size: 0.95rem;
+    line-height: 1.2;
+    /* Make the title take up available space vertically */
+    flex-grow: 1; /* Allow h6 to grow and push subsequent content down */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit title to 2 lines */
+    line-clamp: 2; /* Limit title to 2 lines */
+    -webkit-box-orient: vertical;
+}
+
+.card p {
+    font-size: 0.9rem;
+}
+
+.card .price {
+    font-weight: bold;
+    color: green;
+    font-size: 1rem;
+}
+
+.card .category {
+    font-style: italic;
+    color: #555;
+
 }
 
 .card:hover {
@@ -22,10 +68,14 @@
     justify-content: center;
     align-items: center;
 }
+
 .rating span {
     margin-left: 5px;
 }
-.price {
-    font-weight: bold;
-    color: green;
+
+.card button {
+    margin-top: auto; 
+    width: 100%; 
+    padding: 8px 10px; 
+    font-size: 0.9rem; 
 }

@@ -7,14 +7,15 @@ import Admin from './Pages/Admin';
 import Header from './Components/Header';
 import NavBar from './Components/NavBar';
 import Footer from './Components/Footer';
-import ProtectedAdminRoute from './Components/ProtectedAdminRoute';
-import ProtectedUserRoute from './Components/ProtectedUserRoute';
+import { ProtectedRoute, AdminRoute } from './Components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { AuthProvider } from './Context/AuthContext';
 
 function App() {
 
   return (
     <Router basename="/ProyectoFinal_TT25017_React_FedeHzm/">
+      <AuthProvider>
       <div className='d-flex flex-column min-vh-100'>
         <Header user="Pepito" type="Admin"/>
         <NavBar />
@@ -23,22 +24,23 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/Catalogue" element={<Catalogue/>} />
             <Route path="/Cart" element={
-              <ProtectedUserRoute> 
+              <ProtectedRoute> 
                 <Cart/>
-              </ProtectedUserRoute>
+              </ProtectedRoute>
               }
             />
             <Route path="/Login" element={<Login />} /> 
             <Route path="/Admin/:name" element={
-              <ProtectedAdminRoute> 
+              <AdminRoute> 
                 <Admin/>
-              </ProtectedAdminRoute>
+              </AdminRoute>
               }
             /> 
           </Routes>
         </main>
         <Footer />
       </div>
+      </AuthProvider>
     </Router>
   )
 }

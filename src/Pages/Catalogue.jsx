@@ -3,10 +3,12 @@ import { Container } from "react-bootstrap";
 import CardList from "../Components/CardList";
 // IMPORTAR MODAL DE REACT-BOOTSTRAP
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button'; // También puedes necesitar el Button de Bootstrap
+import Button from 'react-bootstrap/Button'; 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { CartContext } from "../Context/CartContext";
+import { useAuth } from "../Context/AuthContext"; 
+import { useNavigate } from "react-router-dom";
 
 function Catalogue() {
     const [items, setItems] = useState([]);
@@ -17,6 +19,9 @@ function Catalogue() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetch("https://fakestoreapi.com/products")
@@ -110,11 +115,11 @@ function Catalogue() {
                 </Modal.Header>
                 <Modal.Body>
                     {selectedItem && (
-                        <div className="text-center"> {/* Centrar contenido del modal */}
+                        <div className="text-center"> 
                             <div style={{ 
                                 width: '200px', 
                                 height: '200px', 
-                                margin: '0 auto 20px auto', // Centrar y añadir margen
+                                margin: '0 auto 20px auto', 
                                 display: 'flex', 
                                 justifyContent: 'center', 
                                 alignItems: 'center',
@@ -141,9 +146,29 @@ function Catalogue() {
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Cerrar
                     </Button>
+                    {isAuthenticated && (
                     <Button variant="primary" onClick={() => handleAddToCartFromModal(selectedItem)}>
                         Agregar al carrito
                     </Button>
+                    )}
+                    {!isAuthenticated && (
+                        <Button variant="warning" onClick={() => {
+                            MySwal.fire({
+                                title: 'Inicia sesión para agregar al carrito',
+                                text: 'Por favor, inicia sesión para poder agregar productos al carrito.',
+                                icon: 'warning',
+                                confirmButtonText: 'Iniciar Sesión',
+                                cancelButtonText: 'Cancelar',
+                                showCancelButton: true,
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    navigate('/login');
+                                }
+                            });
+                        }}>
+                            Iniciar Sesión
+                        </Button>
+                    )}
                 </Modal.Footer>
             </Modal>
         </Container>

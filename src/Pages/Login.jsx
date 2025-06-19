@@ -3,30 +3,18 @@
 // It contains a form with username and password fields.
 // It uses local storage to store the authentication status.
 import { Container, Form, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { useAuth } from "../Context/AuthContext";
 
 function Login() {
-    const navigate = useNavigate();
-    const handleLogin = () => {
-        // Simulate login action
-        localStorage.setItem("isAuthenticated", true);
-    };
+    const {login} = useAuth();
     const handleSubmit = (e) => {
         e.preventDefault();
         const username = e.target.username.value;
         const password = e.target.password.value;
-        // Simulate authentication
-        if (username === "admin" && password === "admin") {
-            handleLogin();
-            localStorage.setItem("isAdmin", true);
-            navigate("/Admin/peperro");
-        } else if (username === "user" && password === "user") {
-            handleLogin();
-            localStorage.setItem("isAdmin", false);
-            navigate("/");
-        } else {
+        const loginSuccess = login(username, password);
+        if (!loginSuccess) {
             const MySwal = withReactContent(Swal);
             MySwal.fire({
                 title: "Error",

@@ -4,16 +4,11 @@ It uses the 'Link' component from 'react-router-dom' to create client-side navig
 */
 
 import { Nav, Navbar, Container } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-
+import { Link} from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 function NavBar() {
-    const navigate = useNavigate();
-    const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
-    const isAdmin = localStorage.getItem("isAdmin") === "true";
-    const handleLogout = () => {
-        localStorage.removeItem("isAuthenticated");
-        navigate("/Login");
-    };
+    const { isAuthenticated, isAdmin, logout } = useAuth();
+    
     return (
         <Navbar bg="dark" variant="dark" expand="lg">
             <Container>
@@ -35,7 +30,7 @@ function NavBar() {
                             {!isAuthenticated ? (
                                 <Nav.Link as={Link} to="/Login">Login</Nav.Link>
                             ) : (
-                                <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+                                <Nav.Link onClick={logout}>Logout</Nav.Link>
                             )}
                         </Nav>
                     </Nav>

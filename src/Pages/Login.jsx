@@ -2,18 +2,27 @@
 // This component is used to display the login page.
 // It contains a form with username and password fields.
 // It uses local storage to store the authentication status.
-import { Container, Form, Button } from "react-bootstrap";
+import { Container, Form, Button, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useAuth } from "../Context/AuthContext";
+import { useState } from "react"; 
 
 function Login() {
     const {login} = useAuth();
-    const handleSubmit = (e) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (e) => { 
         e.preventDefault();
+        setIsLoading(true);
+
         const username = e.target.username.value;
         const password = e.target.password.value;
-        const loginSuccess = login(username, password);
+        
+        const loginSuccess = await login(username, password); 
+        
+        setIsLoading(false);
+
         if (!loginSuccess) {
             const MySwal = withReactContent(Swal);
             MySwal.fire({
@@ -39,11 +48,25 @@ function Login() {
                     <Form.Control type="password" placeholder="Password" name="password" required />
                 </Form.Group>
 
-                <Button variant="primary" type="submit">
-                    Submit
+                <Button className = "mt-3" variant="primary" type="submit" disabled={isLoading}> {/* Deshabilita el botón mientras carga */}
+                    {isLoading ? (
+                        <>
+                        <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                            className="me-2" // Margen a la derecha del spinner
+                        />
+                        Cargando...
+                        </>
+                    ) : (
+                        "Submit"
+                    )}
                 </Button>
-            </Form>
-        </Container>
+        </Form>
+            </Container>
     );
 }
 export default Login;

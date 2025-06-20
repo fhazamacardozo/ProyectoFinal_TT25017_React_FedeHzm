@@ -10,7 +10,7 @@
     "deploy": "gh-pages -d dist",
     "start": "react-scripts start",
     "build": "vite build",
-    "postbuild": "cp dist/index.html dist/404.html",
+    "postbuild": "copy dist\\index.html dist\\404.html",
     "lint": "eslint .",
     "preview": "vite preview"
   },

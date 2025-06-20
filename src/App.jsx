@@ -17,7 +17,7 @@ function App() {
     <Router basename="/ProyectoFinal_TT25017_React_FedeHzm/">
       <AuthProvider>
       <div className='d-flex flex-column min-vh-100'>
-        <Header user="Pepito" type="Admin"/>
+        <Header/>
         <NavBar />
         <main className="flex-grow-1">
           <Routes>

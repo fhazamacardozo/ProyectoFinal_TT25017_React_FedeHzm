@@ -7,19 +7,21 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useAuth } from "../Context/AuthContext";
 import { useState } from "react"; 
+import { useNavigate } from "react-router-dom";
 
 function Login() {
     const {login} = useAuth();
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => { 
         e.preventDefault();
         setIsLoading(true);
-
-        const username = e.target.username.value;
+        console.log("Login form submitted");
+        const email = e.target.email.value;
         const password = e.target.password.value;
         
-        const loginSuccess = await login(username, password); 
+        const loginSuccess = await login(email, password); 
         
         setIsLoading(false);
 
@@ -38,9 +40,9 @@ function Login() {
         <Container className="py-4">
             <h1 className="text-center">Login</h1>
             <Form onSubmit={handleSubmit} className="w-50 mx-auto">
-                <Form.Group controlId="formBasicEmail">
-                    <Form.Label>Username</Form.Label>
-                    <Form.Control type="text" placeholder="Enter username" name="username" required />
+                <Form.Group controlId="formBasicEmail" className="mb-3">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control type="email" placeholder="Enter email" name="email" required />
                 </Form.Group>
 
                 <Form.Group controlId="formBasicPassword">
@@ -65,6 +67,11 @@ function Login() {
                         "Submit"
                     )}
                 </Button>
+                {/*Register button*/}
+                <div className="mt-3 text-center">
+                    <span>¿No tienes una cuenta? </span>
+                    <Button variant="link" onClick={()=>{navigate('/register');}}>Regístrate aquí</Button>
+                </div>
         </Form>
             </Container>
     );

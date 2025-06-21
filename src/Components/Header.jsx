@@ -8,7 +8,7 @@ function Header() {
             <Container fluid className="px-3">
                 <Navbar.Brand className="text-white">Proyecto Talento 2025</Navbar.Brand>
                 {isAuthenticated && (
-                    <Navbar.Text className="text-white">{}-{user.username}</Navbar.Text>
+                    <Navbar.Text className="text-white">Bienvenido {user.firstName} {user.lastName}</Navbar.Text>
                 )}
             </Container>
         </Navbar>

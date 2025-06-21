@@ -1,125 +1,146 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// Importa las funciones de autenticación de Firebase
+import { 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    signOut,
+    onAuthStateChanged 
+} from "firebase/auth";
+import { auth, db } from "../FireBaseConfig";
+// Importa la instancia de auth y db
+import { doc, getDoc, setDoc } from "firebase/firestore"; // Para Firestore si guardas roles/info de usuario
 
 const AuthContext = createContext();
-// URL base de la Fake Store API
-const FAKESTORE_API_BASE_URL = "https://fakestoreapi.com";
 
 export function AuthProvider ({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null); 
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // Efecto para verificar si hay una sesión activa en localStorage al cargar la app
+ // useEffect para manejar el estado de autenticación de Firebase al inicio
     useEffect(() => {
-    try {
-        const storedAuth = localStorage.getItem("isAuthenticated");
-        const storedToken = localStorage.getItem("authToken"); 
-        const storedUser = localStorage.getItem("user");
-        const storedAdmin = localStorage.getItem("isAdmin");
-
-        if (storedAuth === 'true' && storedToken && storedUser) {
+        // onAuthStateChanged es el listener recomendado para saber si el usuario está logueado
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+        if (firebaseUser) {
+            // Usuario logueado
             setIsAuthenticated(true);
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
-            setIsAdmin(storedAdmin === 'true'); 
+            setUser(firebaseUser); // Guarda el objeto de usuario de Firebase
+
+            // Opcional: Obtener información adicional del usuario de Firestore (ej. rol)
+            try {
+            const userDocRef = doc(db, "users", firebaseUser.uid);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                setIsAdmin(userData.role === "admin");
+                // Puedes extender el objeto user con estos datos si lo necesitas
+                setUser({ ...firebaseUser, ...userData }); 
+            } else {
+                // Si el usuario no tiene un documento en Firestore (ej. recién registrado sin info extra)
+                setIsAdmin(false); // Por defecto no es admin
+                // Opcional: Crear un documento base para el nuevo usuario aquí
+                await setDoc(userDocRef, { email: firebaseUser.email, role: 'user' });
+                setIsAdmin(false);
+                setUser({ ...firebaseUser, role: 'user' });
+            }
+            } catch (error) {
+            console.error("Error al obtener datos de usuario de Firestore:", error);
+            setIsAdmin(false); // Asume no admin si hay error
+            }
+
+        } else {
+            // Usuario no logueado
+            setIsAuthenticated(false);
+            setIsAdmin(false);
+            setUser(null);
         }
-        } catch (error) {
-            console.error("Error al recuperar datos de localStorage:", error);
-            // Limpiar datos corruptos
-            localStorage.removeItem("isAuthenticated");
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("user");
-            localStorage.removeItem("isAdmin");
-        } finally {
-            setLoading(false);
-        }
+        setLoading(false); // La carga inicial ha terminado
+        });
+
+        // Limpia el listener cuando el componente se desmonte
+        return () => unsubscribe();
     }, []);
 
 
-    // Función de Login: Interactúa con el endpoint POST /auth/login de Fake Store API
-    const login = async (username, password) => {
+    // Función de Login con Firebase Authentication
+    const login = async (email, password) => { // Firebase usa email, no username
         try {
-        const response = await axios.post(`${FAKESTORE_API_BASE_URL}/auth/login`, {
-            username,
-            password,
-        });
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const firebaseUser = userCredential.user;
+            console.log("Usuario logueado:", firebaseUser);
 
-        // La API retorna un objeto con { token: "..." } en caso de éxito
-        if (response.data && response.data.token) {
-            const receivedToken = response.data.token;
-            console.log("Login exitoso. Token recibido:", receivedToken);
-            
-            // Simulación básica de rol y datos de usuario 
-            let userRole = 'user'; 
-            if (username === 'mor_2314') { 
-                userRole = 'admin'; 
+            // El listener onAuthStateChanged ya manejará la actualización de estados,
+            // pero puedes hacer una navegación inmediata si lo deseas
+            // Recuperar el rol después de iniciar sesión para la navegación
+            const userDocRef = doc(db, "users", firebaseUser.uid);
+            const userDoc = await getDoc(userDocRef);
+            let userRole = 'user';
+            if (userDoc.exists()) {
+                userRole = userDoc.data().role;
             }
-            const userData = { username: username, role: userRole };
-
-            // Guardar el estado en localStorage
-            localStorage.setItem("isAuthenticated", true);
-            localStorage.setItem("authToken", receivedToken); 
-            localStorage.setItem("user", JSON.stringify(userData));
-            localStorage.setItem("isAdmin", userRole === 'admin');
-
-            // Actualizar los estados del contexto
-            setIsAuthenticated(true);
-            setToken(receivedToken);
-            setUser(userData);
-            setIsAdmin(userRole === 'admin');
-
-            // Navegar según el rol (si lo puedes determinar)
+            
             if (userRole === "admin") {
-                navigate("/Admin/"+userData.username); // Navega al panel de administración
+                navigate("/Admin/"+userDoc.data().username); // Navega al panel de admin
             } else {
                 navigate("/");
             }
             return true; // Login exitoso
-        } else {
-            // Si no hay token en la respuesta (aunque el 200 indique éxito sin token, es un caso raro)
-            console.log("Login exitoso, pero no se recibió un token.");
-            return false;
-        }
-        } catch (error) {
-        // Manejo de errores de la API (ej. 400 Bad Request por credenciales incorrectas)
-        if (error.response) {
-            console.error("Error en la respuesta de la API:", error.response.status, error.response.data);
-        } else if (error.request) {
-            console.error("No se recibió respuesta de la API:", error.request);
-        } else {
-            console.error("Error al configurar la petición:", error.message);
-        }
-        return false; // Login fallido
+        } 
+        catch (error) {
+            console.error("Error de inicio de sesión con Firebase:", error.code, error.message);
+            // Puedes mapear los códigos de error de Firebase a mensajes más amigables
+            return false; // Login fallido
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem("isAuthenticated");
-        localStorage.removeItem("authToken"); 
-        localStorage.removeItem("user");
-        localStorage.removeItem("isAdmin");
+    // Función de Registro (opcional, pero útil para agregar nuevos usuarios)
+    const register = async (email, password, userName, firstName, lastName) => {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const firebaseUser = userCredential.user;
+            console.log("Usuario registrado:", firebaseUser);
 
-        setIsAuthenticated(false);
-        setToken(null); 
-        setUser(null);
-        setIsAdmin(false);
+            // Opcional: Guardar información adicional del usuario en Firestore (ej. rol por defecto)
+            await setDoc(doc(db, "users", firebaseUser.uid), {
+                username: userName,
+                firstName: firstName,
+                lastName: lastName,
+                email: firebaseUser.email,
+                role: "user", // Rol por defecto
+            });
 
-        navigate("/login");
+            navigate("/"); // Navega a home después del registro
+            return true;
+        } 
+        catch (error) {
+            console.error("Error de registro con Firebase:", error.code, error.message);
+            return false;
+        }
+    };
+
+    // Función de Logout con Firebase Authentication
+    const logout = async () => {
+        try {
+            await signOut(auth);
+            // onAuthStateChanged se encargará de limpiar los estados
+            navigate("/login");
+        } 
+        catch (error) {
+            console.error("Error al cerrar sesión con Firebase:", error);
+        }
     };
 
     const value = {
         isAuthenticated,
         isAdmin,
         user,
-        token, // Ahora también exportamos el token
+        loading, // Estado de carga inicial del AuthContext
         login,
+        register, 
         logout,
-        loading,
     };
 
     if (loading) {

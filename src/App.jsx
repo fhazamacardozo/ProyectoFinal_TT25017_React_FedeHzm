@@ -10,6 +10,7 @@ import Footer from './Components/Footer';
 import { ProtectedRoute, AdminRoute } from './Components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from './Context/AuthContext';
+import Register from './Pages/Register';
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
               }
             />
             <Route path="/Login" element={<Login />} /> 
+            <Route path="/Register" element={<Register />} /> {/* Assuming Register is the same as Login for now */}
             <Route path="/Admin/:name" element={
               <AdminRoute> 
                 <Admin/>

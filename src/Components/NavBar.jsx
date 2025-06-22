@@ -19,16 +19,19 @@ function NavBar() {
                         <Nav.Link as={Link} to="/">Home</Nav.Link>
                         <Nav.Link as={Link} to="/Catalogue">Catalogue</Nav.Link>
                         {isAuthenticated && (
-                            <>
+                            <> 
                                 <Nav.Link as={Link} to="/Cart">Cart</Nav.Link>
                                 {isAdmin && (
-                                    <Nav.Link as={Link} to="/Admin/pepe">Admin</Nav.Link>
+                                    <> 
+                                        <Nav.Link as={Link} to="/Admin/pepe">Admin</Nav.Link>
+                                        <Nav.Link as={Link} to="/ProductManager">Product Manager</Nav.Link>
+                                    </>
                                 )}
                             </>
                         )}
                         <Nav>
                             {!isAuthenticated ? (
-                                <Nav.Link as={Link} to="/Login">Login</Nav.Link>
+                                <Nav.Link as={Link} to="/Login">Ingresar</Nav.Link>
                             ) : (
                                 <Nav.Link onClick={logout}>Logout</Nav.Link>
                             )}

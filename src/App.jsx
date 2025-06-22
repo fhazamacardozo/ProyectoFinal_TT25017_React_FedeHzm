@@ -11,6 +11,7 @@ import { ProtectedRoute, AdminRoute } from './Components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from './Context/AuthContext';
 import Register from './Pages/Register';
+import ProductManager from './Pages/ProductManager';
 
 function App() {
 
@@ -36,8 +37,12 @@ function App() {
               <AdminRoute> 
                 <Admin/>
               </AdminRoute>
-              }
-            /> 
+            }/>
+            <Route path="/ProductManager" element={
+              <AdminRoute>
+                <ProductManager/>
+              </AdminRoute>
+            }/> 
           </Routes>
         </main>
         <Footer />

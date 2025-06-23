@@ -7,7 +7,7 @@ import { Nav, Navbar, Container } from "react-bootstrap";
 import { Link} from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 function NavBar() {
-    const { isAuthenticated, isAdmin, logout } = useAuth();
+    const { isAuthenticated, isAdmin, logout, user } = useAuth();
     
     return (
         <Navbar bg="dark" variant="dark" expand="lg">
@@ -23,7 +23,7 @@ function NavBar() {
                                 <Nav.Link as={Link} to="/Cart">Cart</Nav.Link>
                                 {isAdmin && (
                                     <> 
-                                        <Nav.Link as={Link} to="/Admin/pepe">Admin</Nav.Link>
+                                        <Nav.Link as={Link} to={`/Admin/${user.username}`}>Admin</Nav.Link>
                                         <Nav.Link as={Link} to="/ProductManager">Product Manager</Nav.Link>
                                     </>
                                 )}

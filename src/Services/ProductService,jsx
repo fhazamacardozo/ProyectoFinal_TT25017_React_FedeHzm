@@ -1,0 +1,61 @@
+// src/services/productService.js
+import { db } from "../FireBaseConfig"; // Asegúrate que esta ruta sea correcta
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+
+const productsCollectionRef = collection(db, "products");
+
+/**
+ * Obtiene todos los productos de Firestore.
+ * @returns {Array} Una promesa que resuelve con un array de productos.
+ */
+export const getProductsFromDb = async () => {
+    const data = await getDocs(productsCollectionRef);
+    return data.docs.map((document) => ({ ...document.data(), id: document.id }));
+};
+
+/**
+ * Agrega un nuevo producto a Firestore.
+ * @param {Object} productData Los datos del producto a agregar.
+ * @returns {string} El ID del documento agregado.
+ */
+export const addProductToDb = async (productData) => {
+    // Asegurarse de que los datos numéricos estén en el formato correcto
+    const dataToSend = {
+        ...productData,
+        price: parseFloat(productData.price),
+        rating: {
+            count: parseInt(productData.rating.count),
+            rate: parseFloat(productData.rating.rate),
+        },
+    };
+    const docRef = await addDoc(productsCollectionRef, dataToSend);
+    return docRef.id;
+};
+
+/**
+ * Actualiza un producto existente en Firestore.
+ * @param {string} id El ID del producto a actualizar.
+ * @param {Object} updatedProductData Los nuevos datos del producto.
+ */
+export const updateProductInDb = async (id, updatedProductData) => {
+    // Asegurarse de que los datos numéricos estén en el formato correcto
+    const dataToSend = {
+        ...updatedProductData,
+        price: parseFloat(updatedProductData.price),
+        rating: {
+            count: parseInt(updatedProductData.rating.count),
+            rate: parseFloat(updatedProductData.rating.rate),
+        },
+    };
+    const productDocRef = doc(db, "products", id);
+    await updateDoc(productDocRef, dataToSend);
+};
+
+/**
+ * Elimina un producto de Firestore.
+ * @param {string} id El ID del producto a eliminar.
+ */
+export const deleteProductFromDb = async (id) => {
+    const productDocRef = doc(db, "products", id);
+    await deleteDoc(productDocRef);
+};

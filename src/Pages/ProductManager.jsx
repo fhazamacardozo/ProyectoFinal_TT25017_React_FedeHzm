@@ -1,86 +1,68 @@
-import { db } from "../FireBaseConfig"; 
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Form, Button, Table, Modal, Spinner } from "react-bootstrap"; 
+import { Button, Table, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content"; 
-
+import withReactContent from "sweetalert2-react-content";
+import ProductFormModal from "../Components/ProductFormModal"; 
+import { initialProductState } from "../Utils/InitialProductState"; 
+import { 
+        getProductsFromDb,
+        addProductToDb,
+        updateProductInDb,
+        deleteProductFromDb, } 
+    from "../Services/ProductService,jsx";
 
 function ProductManager() {
     const [products, setProducts] = useState([]);
-    const productsCollectionRef = collection(db, "products"); 
-    // Estado para el nuevo producto
-    const [newProduct, setNewProduct] = useState({
-        title: "",
-        category: "",
-        description: "",
-        price: 0,
-        image: "",
+
+    // Estado para el nuevo producto (para el modal de agregar)
+    const [newProduct, setNewProduct] = useState(initialProductState);
+    // Estado para el producto que se está editando
+    const [editingProduct, setEditingProduct] = useState(null);
+
+    // Estados para controlar la visibilidad de los modales
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+
+    const [isLoading, setIsLoading] = useState(false); // Para el spinner de guardado/actualización
+    const [isDeletingId, setIsDeletingId] = useState(null); //para spinner de eliminación
+
+    const MySwal = withReactContent(Swal); // Instancia de SweetAlert2
+
+    // --- Funciones para abrir/cerrar modales ---
+    const handleShowAddModal = () => {
+        setNewProduct(initialProductState); // Asegura que el formulario de agregar esté limpio
+        setShowAddModal(true);
+    };
+    const handleCloseAddModal = () => setShowAddModal(false);
+
+    const handleShowEditModal = (product) => {
+        // Asegurarse de que los valores numéricos sean cadenas para los inputs del formulario
+        const productForEdit = {
+        ...product,
+        price: product.price !== undefined && product.price !== null ? String(product.price) : "",
         rating: {
-            count: 0,
-            rate: 0
+            ...product.rating,
+            count: product.rating?.count !== undefined && product.rating?.count !== null ? String(product.rating.count) : "",
+            rate: product.rating?.rate !== undefined && product.rating?.rate !== null ? String(product.rating.rate) : ""
         }
-    });
-    
-    // Estado para controlar la visibilidad del modal
-    const [showAddProductModal, setShowAddProductModal] = useState(false);
-
-    // Función para abrir el modal
-    const handleShowAddProductModal = () => setShowAddProductModal(true);
-    // Función para cerrar el modal y resetear el formulario
-    const handleCloseAddProductModal = () => {
-        setShowAddProductModal(false);
-        // Resetea el formulario al cerrar el modal
-        setNewProduct({
-            title: "",
-            category: "",
-            description: "",
-            price: 0,
-            image: "",
-            rating: {
-                count: 0,
-                rate: 0
-            }
-        });
+        };
+        setEditingProduct(productForEdit);
+        setShowEditModal(true);
     };
-    const [isLoading, setIsLoading] = useState(false);
-    
-     // Manejador del envío del formulario dentro del modal
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true); // Activa el spinner para el proceso de añadir
-
-        const addSuccess = await addProduct(newProduct); 
-        
-        setIsLoading(false); // Desactiva el spinner
-
-        const MySwal = withReactContent(Swal);
-        if (!addSuccess) {
-            MySwal.fire({
-                title: "Error",
-                text: "Error al agregar el producto",
-                icon: "error",
-                confirmButtonText: "Aceptar",
-            });
-        } else {
-            MySwal.fire({
-                title: "Éxito",
-                text: "Producto agregado correctamente",
-                icon: "success",
-                confirmButtonText: "Aceptar",
-            });
-            handleCloseAddProductModal(); 
-        }
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+        setEditingProduct(null); // Limpiar el producto en edición
     };
 
-    // Función para obtener productos de Firestore
-    const getProducts = async () => {
+    // --- Funciones CRUD (ahora llaman al servicio) ---
+
+  // Obtener productos
+  const fetchProducts = async () => { // Cambiado el nombre para evitar confusión con la función importada
         try {
-            const data = await getDocs(productsCollectionRef);
-            setProducts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+            const fetchedProducts = await getProductsFromDb(); // <--- Llamada al servicio
+            setProducts(fetchedProducts);
         } catch (error) {
             console.error("Error al obtener productos:", error);
-            const MySwal = withReactContent(Swal);
             MySwal.fire({
                 title: "Error",
                 text: "No se pudieron cargar los productos.",
@@ -90,22 +72,33 @@ function ProductManager() {
         }
     };
 
-    // Función para agregar un producto a Firestore
-    const addProduct = async (productData) => { 
-        try {
-            const addedDocRef = await addDoc(productsCollectionRef, productData);
-            console.log("Producto agregado con ID:", addedDocRef.id);
-            await getProducts(); // Vuelve a cargar la lista de productos
-            return true;
-        } catch (error) {
-            console.error("Error al agregar el producto:", error);
-            return false;
-        }
+  // Agregar un producto
+  const handleAddProduct = async (productData) => { // Cambiado el nombre a 'handle'
+    try {
+        await addProductToDb(productData); // <--- Llamada al servicio
+        await fetchProducts(); // Recargar la lista
+        return true;
+    } catch (error) {
+        console.error("Error al agregar el producto:", error);
+        return false;
+    }
+};
+
+  // Actualizar un producto
+  const handleUpdateProduct = async (id, productData) => { // Cambiado el nombre a 'handle'
+    try {
+      await updateProductInDb(id, productData); // <--- Llamada al servicio
+      await fetchProducts(); // Recargar la lista
+        return true;
+    } 
+    catch (error) {
+        console.error("Error al actualizar el producto:", error);
+        return false;
+    }
     };
 
-    // Función para eliminar un producto de Firestore
-    const deleteProduct = async (id) => {
-        const MySwal = withReactContent(Swal);
+  // Función para eliminar un producto
+  const handleDeleteProduct = async (id) => { // Cambiado el nombre a 'handle'
         const result = await MySwal.fire({
             title: "¿Estás seguro?",
             text: "¡No podrás revertir esto!",
@@ -114,203 +107,177 @@ function ProductManager() {
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Sí, eliminarlo",
-            cancelButtonText: "Cancelar"
+            cancelButtonText: "Cancelar",
         });
 
         if (result.isConfirmed) {
+            setIsDeletingId(id);
             try {
-                const productDoc = doc(db, "products", id);
-                await deleteDoc(productDoc);
-                await getProducts(); // Vuelve a cargar la lista
+                await deleteProductFromDb(id); // <--- Llamada al servicio
+                await fetchProducts(); // Recargar la lista
                 MySwal.fire("¡Eliminado!", "El producto ha sido eliminado.", "success");
             } catch (error) {
                 console.error("Error al eliminar el producto:", error);
                 MySwal.fire("Error", "No se pudo eliminar el producto.", "error");
+            } finally {
+                setIsDeletingId(null);
             }
-        }
+            }
     };
 
-    // Función para actualizar un producto en Firestore
-    const updateProduct = async (id, updatedProductData) => {
-        try {
-            const productDocRef = doc(db, "products", id);
-            await updateDoc(productDocRef, updatedProductData);
-            await getProducts(); // Vuelve a cargar la lista
-            const MySwal = withReactContent(Swal);
-            MySwal.fire("Actualizado!", "El producto ha sido actualizado.", "success");
-            return true;
-        } catch (error) {
-            console.error("Error al actualizar el producto:", error);
-            const MySwal = withReactContent(Swal);
-            MySwal.fire("Error", "No se pudo actualizar el producto.", "error");
-            return false;
+    // --- Manejador de Submit Unificado ---
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        let success = false;
+        if (showAddModal) {
+        success = await handleAddProduct(newProduct);
+        } else if (showEditModal && editingProduct) {
+        success = await handleUpdateProduct(editingProduct.id, editingProduct);
+        }
+
+        setIsLoading(false);
+
+        if (!success) {
+        MySwal.fire({
+            title: "Error",
+            text: showAddModal
+            ? "Error al agregar el producto"
+            : "Error al actualizar el producto",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+        });
+        } else {
+        MySwal.fire({
+            title: "Éxito",
+            text: showAddModal
+            ? "Producto agregado correctamente"
+            : "Producto actualizado correctamente",
+            icon: "success",
+            confirmButtonText: "Aceptar",
+        });
+        // Cerrar el modal correspondiente
+        showAddModal ? handleCloseAddModal() : handleCloseEditModal();
         }
     };
 
     useEffect(() => {
-        getProducts();
+        fetchProducts(); 
     }, []);
 
     return (
-        //Lista productos en forma de tabla con botones para agregar, eliminar y actualizar
-        //Los produtos tienen titulo, categoria, descripción, precio, url de imagen , un rating.count y un rating.rate
         <div className="container mt-5">
-            <h2>Product Manager</h2>
-            
-            {/* Botón para abrir el modal de agregar producto */}
-            <Button variant="primary" onClick={handleShowAddProductModal} className="mb-3">
-                Agregar Nuevo Producto
-            </Button>
+        <h2>Gestor de Productos</h2>
 
-            {/* Modal para agregar productos */}
-            <Modal show={showAddProductModal} onHide={handleCloseAddProductModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Agregar Nuevo Producto</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form onSubmit={handleSubmit}>
-                        {/* Aquí va todo el formulario de agregar producto */}
-                        <Form.Group controlId="formAddTitle" className="mb-3">
-                            <Form.Label>Title</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Enter product title"
-                                name="title"
-                                value={newProduct.title}
-                                onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formAddCategory" className="mb-3">
-                            <Form.Label>Category</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Enter product category"
-                                name="category"
-                                value={newProduct.category}
-                                onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formAddDescription" className="mb-3">
-                            <Form.Label>Description</Form.Label>
-                            <Form.Control
-                                as="textarea" // Cambiado a textarea para descripciones más largas
-                                rows={3}
-                                placeholder="Enter product description"
-                                name="description"
-                                value={newProduct.description}
-                                onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formAddPrice" className="mb-3">
-                            <Form.Label>Price</Form.Label>
-                            <Form.Control
-                                type="number"
-                                placeholder="Enter product price"
-                                name="price"
-                                value={newProduct.price}
-                                onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formAddImage" className="mb-3">
-                            <Form.Label>Image URL</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Enter product image URL"
-                                name="image"
-                                value={newProduct.image}
-                                onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formAddRatingCount" className="mb-3">
-                            <Form.Label>Rating Count</Form.Label>
-                            <Form.Control
-                                type="number"
-                                placeholder="Enter rating count"
-                                name="ratingCount"
-                                value={newProduct.rating.count}
-                                onChange={(e) => setNewProduct({ ...newProduct, rating: { ...newProduct.rating, count: parseInt(e.target.value) } })}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formAddRatingRate" className="mb-3">
-                            <Form.Label>Rating Rate</Form.Label>
-                            <Form.Control
-                                type="number"
-                                step="0.1" // Permite números decimales para el rating
-                                placeholder="Enter rating rate"
-                                name="ratingRate"
-                                value={newProduct.rating.rate}
-                                onChange={(e) => setNewProduct({ ...newProduct, rating: { ...newProduct.rating, rate: parseFloat(e.target.value) } })}
-                                required
-                            />
-                        </Form.Group>
-                        <Button variant="primary" type="submit" disabled={isLoading}>
-                            {isLoading ? (
-                                <>
-                                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-2" />
-                                    Agregando...
-                                </>
-                            ) : (
-                                "Agregar Producto"
-                            )}
-                        </Button>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseAddProductModal}>
-                        Cancelar
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+        {/* Botones para abrir modales */}
+        <Button variant="primary" onClick={handleShowAddModal} className="mb-3 me-2">
+            Agregar Nuevo Producto
+        </Button>
+        {/* Modal para Agregar Producto */}
+            <ProductFormModal
+                show={showAddModal}
+                onHide={handleCloseAddModal}
+                product={newProduct}
+                setProduct={setNewProduct}
+                onSubmit={handleSubmit}
+                title="Agregar Nuevo Producto"
+                isLoading={isLoading}
+            />
 
-            {/* Tabla de productos existente */}
-            <Table striped bordered hover responsive className="mt-3">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Título</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Imagen</th>
-                        <th>Rating (Count/Rate)</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {products.length === 0 ? (
-                        <tr>
-                            <td colSpan="7" className="text-center">No hay productos disponibles.</td>
-                        </tr>
-                    ) : (
-                        products.map((product) => (
-                            <tr key={product.id}>
-                                <td>{product.id}</td>
-                                <td>{product.title}</td>
-                                <td>{product.category}</td>
-                                <td>${product.price ? product.price.toFixed(2) : 'N/A'}</td> {/* Formato de precio */}
-                                <td>
-                                    {product.image && (
-                                        <img src={product.image} alt={product.title} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                                    )}
-                                </td>
-                                <td>{product.rating?.count || 0} / {product.rating?.rate || 0}</td>
-                                <td>
-                                    <Button variant="danger" size="sm" onClick={() => deleteProduct(product.id)} className="me-2">Eliminar</Button>
-                                    {/* Botón de edición aquí (tarea futura) */}
-                                    <Button variant="info" size="sm" onClick={() => {/* Lógica de edición */}}>Editar</Button>
-                                </td>
-                            </tr>
-                        ))
+        {/* Modal para Editar Producto */}
+        {editingProduct && ( // Solo renderiza si hay un producto para editar
+            <ProductFormModal
+                show={showEditModal}
+                onHide={handleCloseEditModal}
+                product={editingProduct}
+                setProduct={setEditingProduct}
+                onSubmit={handleSubmit}
+                title="Editar Producto"
+                isLoading={isLoading}
+            />
+        )}
+
+        {/* Tabla de productos */}
+        <Table striped bordered hover responsive className="mt-3">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Imagen</th>
+                <th>Rating (Votos/Tasa)</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {products.length === 0 ? (
+                <tr>
+                <td colSpan="7" className="text-center">
+                    No hay productos disponibles.
+                </td>
+                </tr>
+            ) : (
+                products.map((product) => (
+                <tr key={product.id}>
+                    <td>{product.id}</td>
+                    <td>{product.title}</td>
+                    <td>{product.category}</td>
+                    <td>${product.price !== undefined && product.price !== null ? product.price.toFixed(2) : "N/A"}</td>
+                    <td>
+                    {product.image && (
+                        <img
+                        src={product.image}
+                        alt={product.title}
+                        style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                        />
                     )}
-                </tbody>
-            </Table>
+                    </td>
+                    <td>
+                    {product.rating?.count || 0} / {product.rating?.rate || 0}
+                    </td>
+                    <td>
+                    <Button
+                        variant="info"
+                        size="sm"
+                        onClick={() => handleShowEditModal(product)}
+                        className="me-2"
+                    >
+                        Editar
+                    </Button>
+                    <Button
+                        variant="danger"
+                        size="sm"
+                        // Deshabilita el botón si este producto se está eliminando
+                        // y muestra el spinner.
+                        disabled={isDeletingId === product.id}
+                        onClick={() => handleDeleteProduct(product.id)}
+                    >
+                        {isDeletingId === product.id ? (
+                            <>
+                                <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="me-1" // Espacio entre spinner y texto
+                                />
+                                Eliminando...
+                            </>
+                        ) : (
+                            "Eliminar"
+                        )}
+                    </Button>
+                    </td>
+                </tr>
+                ))
+            )}
+            </tbody>
+        </Table>
         </div>
-        
     );
 }
+
 export default ProductManager;

@@ -1,25 +1,56 @@
-// src/components/ProductFormModal.jsx
 import { useState, useEffect } from "react";
 import { Form, Button, Modal, Spinner } from "react-bootstrap";
 
 function ProductFormModal({
     show,
     onHide,
-    product, // el estado del producto (newProduct o editingProduct)
-    setProduct, // el setter de ese estado (setNewProduct o setEditingProduct)
+    product,
+    setProduct,
     onSubmit,
-    title, // Título del modal (e.g., "Agregar Producto", "Editar Producto")
+    title,
     isLoading,
 }) {
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
 
+    // Estado para controlar la validez general del formulario
+    const [isFormValid, setIsFormValid] = useState(false); 
+
     useEffect(() => {
         if (show) {
             setErrors({});
             setTouched({});
+            setIsFormValid(false); // <--- Resetear validez al abrir el modal
         }
     }, [show]);
+
+    // useEffect para recalcular la validez del formulario completo
+    // cada vez que 'product' o 'errors' cambian
+    useEffect(() => {
+        // Ejecutar la validación completa del formulario.
+        // PERO sin marcar los campos como 'touched' automáticamente.
+        // Solo necesitamos saber si *actualmente* todos los campos pasan la validación.
+        const fieldsToCheck = [
+            { name: "title", value: product.title },
+            { name: "category", value: product.category },
+            { name: "description", value: product.description },
+            { name: "price", value: product.price },
+            { name: "image", value: product.image },
+            { name: "ratingCount", value: product.rating?.count },
+            { name: "ratingRate", value: product.rating?.rate },
+        ];
+
+        let allValid = true;
+        fieldsToCheck.forEach(({ name, value }) => {
+            const error = validateField(name, value);
+            if (error) {
+                allValid = false;
+            }
+            // No actualizamos `errors` ni `touched` aquí, solo chequeamos para `isFormValid`
+        });
+        setIsFormValid(allValid);
+    }, [product, errors]); // Depende de 'product' (cuando se edita) y 'errors' (cuando se actualizan)
+
 
     if (!product) {
         return null;
@@ -62,12 +93,7 @@ function ProductFormModal({
             case "image": {
                 if (!value.trim()) {
                     error = "La URL de la imagen es obligatoria.";
-                }
-                // *** MODIFICACIÓN AQUÍ para la URL de la imagen ***
-                // Esta regex es más flexible. Permite URLs que parecen válidas sin exigir una extensión.
-                // Si necesitas una validación más estricta de "es una imagen real",
-                // eso es mejor hacerlo en el backend o con una API de terceros.
-                else if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(value)) {
+                } else if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(value)) {
                     error = "Introduce una URL válida (ej. http://example.com/imagen.jpg o http://cdn.com/id/imagen).";
                 }
                 break;
@@ -76,9 +102,7 @@ function ProductFormModal({
                 const countValue = parseInt(value);
                 if (value === "" || isNaN(countValue)) {
                     error = "El conteo de votos es obligatorio.";
-                }
-                // *** MODIFICACIÓN AQUÍ para ratingCount: no permitir cero ***
-                else if (countValue <= 0) { // Cambiado de < 0 a <= 0
+                } else if (countValue <= 0) {
                     error = "El conteo de votos no puede ser negativo o cero.";
                 }
                 break;
@@ -122,7 +146,9 @@ function ProductFormModal({
 
         setErrors(newErrors);
         setTouched(allFieldsTouched);
-        return Object.keys(newErrors).length === 0;
+        const formIsValid = Object.keys(newErrors).length === 0;
+        setIsFormValid(formIsValid); // <--- Actualizar isFormValid después de una validación completa
+        return formIsValid;
     };
 
     const handleChange = (e) => {
@@ -175,16 +201,13 @@ function ProductFormModal({
             case "category":
                 return hasNoError && product[name] && product[name].trim() !== "";
             case "image":
-                // *** MODIFICACIÓN AQUÍ para isFieldValid de la imagen ***
-                // Usa la misma lógica que en validateField para la validez
                 return hasNoError && product.image && /^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(product.image);
             case "description":
                 return hasNoError && product.description && product.description.trim().length >= 10;
             case "price":
                 return hasNoError && typeof product.price === 'number' && parseFloat(product.price) > 0;
             case "ratingCount":
-                // *** MODIFICACIÓN AQUÍ para isFieldValid de ratingCount: no permitir cero ***
-                return hasNoError && typeof product.rating?.count === 'number' && parseInt(product.rating.count) > 0; // Cambiado de >= 0 a > 0
+                return hasNoError && typeof product.rating?.count === 'number' && parseInt(product.rating.count) > 0;
             case "ratingRate":
                 return hasNoError && typeof product.rating?.rate === 'number' && parseFloat(product.rating.rate) >= 1 && parseFloat(product.rating.rate) <= 5;
             default:
@@ -341,7 +364,7 @@ function ProductFormModal({
                         </Form.Control.Feedback>
                     </Form.Group>
 
-                    <Button variant="primary" type="submit" disabled={isLoading}>
+                    <Button variant="primary" type="submit" disabled={isLoading || !isFormValid}> {/* <--- MODIFICACIÓN CLAVE AQUÍ */}
                         {isLoading ? (
                             <>
                                 <Spinner

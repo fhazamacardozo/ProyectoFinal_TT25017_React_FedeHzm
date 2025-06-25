@@ -1,27 +1,32 @@
 import { useEffect, useState } from "react";
-import { Button, Table, Spinner } from "react-bootstrap";
+import { Button, Table, Spinner, Alert } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import ProductFormModal from "../Components/ProductFormModal"; 
+import JsonUploadModal from "../Components/JsonUploadModal";
 import { initialProductState } from "../Utils/InitialProductState"; 
 import { 
         getProductsFromDb,
         addProductToDb,
         updateProductInDb,
-        deleteProductFromDb, } 
+        deleteProductFromDb,
+        addProductsFromJsonToDb, 
+    } 
     from "../Services/ProductService,jsx";
 
 function ProductManager() {
     const [products, setProducts] = useState([]);
 
-    // Estado para el nuevo producto (para el modal de agregar)
     const [newProduct, setNewProduct] = useState(initialProductState);
-    // Estado para el producto que se está editando
     const [editingProduct, setEditingProduct] = useState(null);
 
     // Estados para controlar la visibilidad de los modales
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showJsonUploadModal, setShowJsonUploadModal] = useState(false);
+
+    const [isUploadingJson, setIsUploadingJson] = useState(false); 
+    const [jsonUploadFeedback, setJsonUploadFeedback] = useState({ message: '', type: '' }); 
 
     const [isLoading, setIsLoading] = useState(false); // Para el spinner de guardado/actualización
     const [isDeletingId, setIsDeletingId] = useState(null); //para spinner de eliminación
@@ -54,12 +59,19 @@ function ProductManager() {
         setEditingProduct(null); // Limpiar el producto en edición
     };
 
+    const handleShowJsonUploadModal = () => {
+        setJsonUploadFeedback({ message: '', type: '' }); // Resetear feedback
+        setShowJsonUploadModal(true);
+    };
+    const handleCloseJsonUploadModal = () => setShowJsonUploadModal(false);
+
     // --- Funciones CRUD (ahora llaman al servicio) ---
 
-  // Obtener productos
-  const fetchProducts = async () => { // Cambiado el nombre para evitar confusión con la función importada
+ // Obtener productos
+    const fetchProducts = async () => {
+        setIsLoading(true); // Podrías usar un estado de carga general para la tabla
         try {
-            const fetchedProducts = await getProductsFromDb(); // <--- Llamada al servicio
+            const fetchedProducts = await getProductsFromDb();
             setProducts(fetchedProducts);
         } catch (error) {
             console.error("Error al obtener productos:", error);
@@ -69,6 +81,8 @@ function ProductManager() {
                 icon: "error",
                 confirmButtonText: "Aceptar",
             });
+        } finally {
+            setIsLoading(false); // Finalizar carga general
         }
     };
 
@@ -113,8 +127,8 @@ function ProductManager() {
         if (result.isConfirmed) {
             setIsDeletingId(id);
             try {
-                await deleteProductFromDb(id); // <--- Llamada al servicio
-                await fetchProducts(); // Recargar la lista
+                await deleteProductFromDb(id);
+                await fetchProducts(); 
                 MySwal.fire("¡Eliminado!", "El producto ha sido eliminado.", "success");
             } catch (error) {
                 console.error("Error al eliminar el producto:", error);
@@ -132,9 +146,9 @@ function ProductManager() {
 
         let success = false;
         if (showAddModal) {
-        success = await handleAddProduct(newProduct);
+            success = await handleAddProduct(newProduct);
         } else if (showEditModal && editingProduct) {
-        success = await handleUpdateProduct(editingProduct.id, editingProduct);
+            success = await handleUpdateProduct(editingProduct.id, editingProduct);
         }
 
         setIsLoading(false);
@@ -162,6 +176,45 @@ function ProductManager() {
         }
     };
 
+    // FUNCIÓN para manejar la carga de productos desde JSON
+const handleProductsLoadedFromJson = async (loadedProducts) => {
+        setIsUploadingJson(true); // Activa el spinner de carga para el modal JSON
+        setJsonUploadFeedback({ message: '', type: '' }); // Limpia feedback previo
+
+        try {
+            const { uploadedCount, failedCount, errors } = await addProductsFromJsonToDb(loadedProducts); // Llama al servicio
+
+            if (failedCount > 0) {
+                setJsonUploadFeedback({
+                    message: `Se subieron ${uploadedCount} producto(s) con éxito, pero ${failedCount} fallaron.`,
+                    type: 'warning'
+                });
+                console.error("Detalles de errores en la subida JSON:", errors);
+                // Si hubo fallos, podríamos no cerrar el modal para que el usuario vea el mensaje de advertencia.
+                // O cerrarlo después de un breve retraso.
+                // setTimeout(() => handleCloseJsonUploadModal(), 4000); // Ejemplo: cerrar después de 4 segundos
+            } else {
+                setJsonUploadFeedback({
+                    message: `¡Éxito! Se subieron ${uploadedCount} producto(s) correctamente.`,
+                    type: 'success'
+                });
+                // Si todo fue exitoso, cerramos el modal inmediatamente
+                handleCloseJsonUploadModal(); // <--- DESCOMENTA O AÑADE ESTA LÍNEA
+            }
+            await fetchProducts(); // Recargar la lista de productos en la tabla
+        } catch (error) {
+            console.error("Error al cargar productos desde JSON:", error);
+            setJsonUploadFeedback({
+                message: `Error grave al procesar el archivo JSON: ${error.message}`,
+                type: 'danger'
+            });
+            // Si hay un error grave, podríamos no cerrar el modal o cerrarlo después de un retraso.
+            // setTimeout(() => handleCloseJsonUploadModal(), 5000);
+        } finally {
+            setIsUploadingJson(false); // Desactiva el spinner
+        }
+    };
+
     useEffect(() => {
         fetchProducts(); 
     }, []);
@@ -170,10 +223,22 @@ function ProductManager() {
         <div className="container mt-5">
         <h2>Gestor de Productos</h2>
 
-        {/* Botones para abrir modales */}
+        {/* Botones para abrir modal de agreggar */}
         <Button variant="primary" onClick={handleShowAddModal} className="mb-3 me-2">
             Agregar Nuevo Producto
         </Button>
+        {/*BOTÓN para abrir el modal de subida JSON */}
+        <Button variant="success" onClick={handleShowJsonUploadModal} className="mb-3">
+            Cargar Productos desde JSON
+        </Button>
+
+        {/* Mensajes de feedback para la subida JSON (se muestran debajo de los botones) */}
+        {jsonUploadFeedback.message && (
+            <Alert variant={jsonUploadFeedback.type} className="mt-3">
+                {jsonUploadFeedback.message}
+            </Alert>
+        )}
+
         {/* Modal para Agregar Producto */}
             <ProductFormModal
                 show={showAddModal}
@@ -197,6 +262,13 @@ function ProductManager() {
                 isLoading={isLoading}
             />
         )}
+        {/* MODAL DE SUBIDA JSON */}
+        <JsonUploadModal
+            show={showJsonUploadModal}
+            onHide={handleCloseJsonUploadModal}
+            onProductsLoaded={handleProductsLoadedFromJson}
+            isLoading={isUploadingJson} // Pasa el estado de carga al modal
+        />
 
         {/* Tabla de productos */}
         <Table striped bordered hover responsive className="mt-3">

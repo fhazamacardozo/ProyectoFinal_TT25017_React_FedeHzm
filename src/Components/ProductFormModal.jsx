@@ -12,100 +12,96 @@ function ProductFormModal({
     isLoading,
 }) {
     const [errors, setErrors] = useState({});
-    const [touched, setTouched] = useState({}); // New state to track if a field has been touched
+    const [touched, setTouched] = useState({});
 
-    // Reset errors and touched state when the modal is shown or product changes
     useEffect(() => {
         if (show) {
             setErrors({});
             setTouched({});
         }
-    }, [show, product]);
+    }, [show]);
 
-    // Protección adicional para 'product' en caso de que sea null inicialmente
     if (!product) {
-        return null; // O un spinner si prefieres mostrar algo mientras se carga
+        return null;
     }
 
     // --- Validation Logic ---
-    const validateField = (name, value, currentProduct) => {
+    const validateField = (name, value) => {
         let error = "";
-        let isValid = false;
 
         switch (name) {
-            case "title":
+            case "title": {
                 if (!value.trim()) {
                     error = "El título es obligatorio.";
-                } else {
-                    isValid = true;
                 }
                 break;
-            case "category":
+            }
+            case "category": {
                 if (!value.trim()) {
                     error = "La categoría es obligatoria.";
-                } else {
-                    isValid = true;
                 }
                 break;
-            case "description":
+            }
+            case "description": {
                 if (!value.trim()) {
                     error = "La descripción es obligatoria.";
                 } else if (value.trim().length < 10) {
                     error = `La descripción debe tener al menos 10 caracteres. Faltan ${10 - value.trim().length}.`;
-                } else {
-                    isValid = true;
                 }
                 break;
-            case "price":
+            }
+            case "price": {
                 const priceValue = parseFloat(value);
                 if (value === "" || isNaN(priceValue)) {
                     error = "El precio es obligatorio.";
                 } else if (priceValue <= 0) {
                     error = "El precio debe ser mayor a 0.";
-                } else {
-                    isValid = true;
                 }
                 break;
-            case "image":
+            }
+            case "image": {
                 if (!value.trim()) {
                     error = "La URL de la imagen es obligatoria.";
-                } else if (!/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(value)) {
-                    error = "Introduce una URL de imagen válida (ej. .jpg, .png).";
-                } else {
-                    isValid = true;
+                }
+                // *** MODIFICACIÓN AQUÍ para la URL de la imagen ***
+                // Esta regex es más flexible. Permite URLs que parecen válidas sin exigir una extensión.
+                // Si necesitas una validación más estricta de "es una imagen real",
+                // eso es mejor hacerlo en el backend o con una API de terceros.
+                else if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(value)) {
+                    error = "Introduce una URL válida (ej. http://example.com/imagen.jpg o http://cdn.com/id/imagen).";
                 }
                 break;
-            case "ratingCount":
+            }
+            case "ratingCount": {
                 const countValue = parseInt(value);
                 if (value === "" || isNaN(countValue)) {
                     error = "El conteo de votos es obligatorio.";
-                } else if (countValue < 0) {
-                    error = "El conteo de votos no puede ser negativo.";
-                } else {
-                    isValid = true;
+                }
+                // *** MODIFICACIÓN AQUÍ para ratingCount: no permitir cero ***
+                else if (countValue <= 0) { // Cambiado de < 0 a <= 0
+                    error = "El conteo de votos no puede ser negativo o cero.";
                 }
                 break;
-            case "ratingRate":
+            }
+            case "ratingRate": {
                 const rateValue = parseFloat(value);
                 if (value === "" || isNaN(rateValue)) {
                     error = "La tasa de votos es obligatoria.";
                 } else if (rateValue < 1 || rateValue > 5) {
                     error = "La tasa de votos debe estar entre 1 y 5.";
-                } else {
-                    isValid = true;
                 }
                 break;
+            }
             default:
                 break;
         }
-        return { error, isValid };
+        return error;
     };
 
-    const validateForm = () => {
+    const validateAllFields = () => {
         const newErrors = {};
-        const tempTouched = {}; // To mark all fields as touched on form submission
+        const allFieldsTouched = {};
 
-        // Re-validate all fields on submission to show all errors
         const fieldsToValidate = [
             { name: "title", value: product.title },
             { name: "category", value: product.category },
@@ -117,15 +113,15 @@ function ProductFormModal({
         ];
 
         fieldsToValidate.forEach(({ name, value }) => {
-            const { error } = validateField(name, value, product);
+            const error = validateField(name, value);
             if (error) {
                 newErrors[name] = error;
             }
-            tempTouched[name] = true; // Mark all fields as touched when submitting
+            allFieldsTouched[name] = true;
         });
 
         setErrors(newErrors);
-        setTouched(tempTouched); // Update touched state
+        setTouched(allFieldsTouched);
         return Object.keys(newErrors).length === 0;
     };
 
@@ -133,7 +129,6 @@ function ProductFormModal({
         const { name, value } = e.target;
         let updatedProduct = { ...product };
 
-        // Handle nested rating object
         if (name === "ratingCount" || name === "ratingRate") {
             updatedProduct = {
                 ...product,
@@ -157,16 +152,43 @@ function ProductFormModal({
 
         setProduct(updatedProduct);
 
-        // Live validation for the current field
-        const { error } = validateField(name, value, updatedProduct);
+        const error = validateField(name, value);
         setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
         setTouched((prevTouched) => ({ ...prevTouched, [name]: true }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (validateForm()) {
+        if (validateAllFields()) {
             onSubmit(e);
+        }
+    };
+
+    const isFieldValid = (name) => {
+        const hasNoError = !errors[name];
+        const isTouched = touched[name];
+
+        if (!isTouched) return false;
+
+        switch (name) {
+            case "title":
+            case "category":
+                return hasNoError && product[name] && product[name].trim() !== "";
+            case "image":
+                // *** MODIFICACIÓN AQUÍ para isFieldValid de la imagen ***
+                // Usa la misma lógica que en validateField para la validez
+                return hasNoError && product.image && /^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(product.image);
+            case "description":
+                return hasNoError && product.description && product.description.trim().length >= 10;
+            case "price":
+                return hasNoError && typeof product.price === 'number' && parseFloat(product.price) > 0;
+            case "ratingCount":
+                // *** MODIFICACIÓN AQUÍ para isFieldValid de ratingCount: no permitir cero ***
+                return hasNoError && typeof product.rating?.count === 'number' && parseInt(product.rating.count) > 0; // Cambiado de >= 0 a > 0
+            case "ratingRate":
+                return hasNoError && typeof product.rating?.rate === 'number' && parseFloat(product.rating.rate) >= 1 && parseFloat(product.rating.rate) <= 5;
+            default:
+                return false;
         }
     };
 
@@ -176,7 +198,7 @@ function ProductFormModal({
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form onSubmit={handleSubmit} noValidate> {/* Add noValidate to prevent browser's default validation */}
+                <Form onSubmit={handleSubmit} noValidate>
                     {/* Título */}
                     <Form.Group controlId="formTitle" className="mb-3">
                         <Form.Label>Título</Form.Label>
@@ -186,8 +208,8 @@ function ProductFormModal({
                             name="title"
                             value={product.title}
                             onChange={handleChange}
-                            isInvalid={!!errors.title && touched.title} // Show invalid only if touched AND has error
-                            isValid={!errors.title && touched.title && product.title.trim() !== ""} // Show valid only if touched AND no error AND not empty
+                            isInvalid={!!errors.title && touched.title}
+                            isValid={isFieldValid("title")}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.title}
@@ -207,7 +229,7 @@ function ProductFormModal({
                             value={product.category}
                             onChange={handleChange}
                             isInvalid={!!errors.category && touched.category}
-                            isValid={!errors.category && touched.category && product.category.trim() !== ""}
+                            isValid={isFieldValid("category")}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.category}
@@ -228,7 +250,7 @@ function ProductFormModal({
                             value={product.description}
                             onChange={handleChange}
                             isInvalid={!!errors.description && touched.description}
-                            isValid={!errors.description && touched.description && product.description.trim().length >= 10}
+                            isValid={isFieldValid("description")}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.description}
@@ -248,7 +270,7 @@ function ProductFormModal({
                             value={product.price}
                             onChange={handleChange}
                             isInvalid={!!errors.price && touched.price}
-                            isValid={!errors.price && touched.price && parseFloat(product.price) > 0}
+                            isValid={isFieldValid("price")}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.price}
@@ -268,7 +290,7 @@ function ProductFormModal({
                             value={product.image}
                             onChange={handleChange}
                             isInvalid={!!errors.image && touched.image}
-                            isValid={!errors.image && touched.image && /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(product.image)}
+                            isValid={isFieldValid("image")}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.image}
@@ -288,7 +310,7 @@ function ProductFormModal({
                             value={product.rating?.count || ""}
                             onChange={handleChange}
                             isInvalid={!!errors.ratingCount && touched.ratingCount}
-                            isValid={!errors.ratingCount && touched.ratingCount && parseInt(product.rating?.count) >= 0}
+                            isValid={isFieldValid("ratingCount")}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.ratingCount}
@@ -309,7 +331,7 @@ function ProductFormModal({
                             value={product.rating?.rate || ""}
                             onChange={handleChange}
                             isInvalid={!!errors.ratingRate && touched.ratingRate}
-                            isValid={!errors.ratingRate && touched.ratingRate && parseFloat(product.rating?.rate) >= 1 && parseFloat(product.rating?.rate) <= 5}
+                            isValid={isFieldValid("ratingRate")}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.ratingRate}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, use } from "react";
 import { Container } from "react-bootstrap";
 import CardList from "../Components/CardList";
 // IMPORTAR MODAL DE REACT-BOOTSTRAP
@@ -9,6 +9,7 @@ import withReactContent from "sweetalert2-react-content";
 import { CartContext } from "../Context/CartContext";
 import { useAuth } from "../Context/AuthContext"; 
 import { useNavigate } from "react-router-dom";
+import {getProductsFromDb,} from "../Services/ProductService,jsx";
 
 function Catalogue() {
     const [items, setItems] = useState([]);
@@ -23,18 +24,28 @@ function Catalogue() {
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
+    //Cargo los productos de mi db de firestore
+    const fetchProducts = async () => {
+        setLoading(true); // Podrías usar un estado de carga general para la tabla
+        try {
+            const fetchedProducts = await getProductsFromDb();
+            setItems(fetchedProducts);
+        } catch (error) {
+            console.error("Error al obtener productos:", error);
+            MySwal.fire({
+                title: "Error",
+                text: "No se pudieron cargar los productos.",
+                    icon: "error",
+                    confirmButtonText: "Aceptar",
+                });
+            setError("No se pudieron cargar los productos.");
+            } finally {
+                setLoading(false); // Finalizar carga general
+            }
+        };
+    
     useEffect(() => {
-        fetch("https://fakestoreapi.com/products")
-            .then((response) => response.json())
-            .then((data) => {
-                setItems(data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error("Error fetching items:", error);
-                setError("Error al cargar los productos. Por favor, inténtalo de nuevo más tarde.", error);
-                setLoading(false);
-            });
+        fetchProducts();
     }, []);
 
     const handleOpenModal = (item) => {

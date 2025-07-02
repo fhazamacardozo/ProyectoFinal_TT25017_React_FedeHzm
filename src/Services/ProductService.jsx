@@ -100,6 +100,6 @@ export const addProductsFromJsonToDb = async (productsArray) => {
         uploadedCount,
         failedCount,
         errors,
-        results // Puedes retornar los resultados individuales si necesitas más detalle
+        results 
     };
 };

@@ -12,7 +12,7 @@ import {
         deleteProductFromDb,
         addProductsFromJsonToDb, 
     } 
-    from "../Services/ProductService,jsx";
+    from "../Services/ProductService";
 
 function ProductManager() {
     const [products, setProducts] = useState([]);

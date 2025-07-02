@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, use } from "react";
+import { useState, useEffect, useContext, } from "react";
 import { Container } from "react-bootstrap";
 import CardList from "../Components/CardList";
 // IMPORTAR MODAL DE REACT-BOOTSTRAP
@@ -9,7 +9,7 @@ import withReactContent from "sweetalert2-react-content";
 import { CartContext } from "../Context/CartContext";
 import { useAuth } from "../Context/AuthContext"; 
 import { useNavigate } from "react-router-dom";
-import {getProductsFromDb,} from "../Services/ProductService,jsx";
+import {getProductsFromDb,} from "../Services/ProductService";
 
 function Catalogue() {
     const [items, setItems] = useState([]);
@@ -42,7 +42,7 @@ function Catalogue() {
             } finally {
                 setLoading(false); // Finalizar carga general
             }
-        };
+    };
     
     useEffect(() => {
         fetchProducts();

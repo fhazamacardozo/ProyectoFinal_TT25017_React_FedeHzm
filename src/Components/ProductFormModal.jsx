@@ -186,7 +186,7 @@ function ProductFormModal({
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validateAllFields()) {
-            onSubmit(e);
+            onSubmit(product);
         }
     };
 

@@ -1,21 +1,25 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Table, Spinner, Alert } from "react-bootstrap";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import ProductFormModal from "../Components/ProductFormModal"; 
 import JsonUploadModal from "../Components/JsonUploadModal";
 import { initialProductState } from "../Utils/InitialProductState"; 
-import { 
-        getProductsFromDb,
-        addProductToDb,
-        updateProductInDb,
-        deleteProductFromDb,
-        addProductsFromJsonToDb, 
-    } 
-    from "../Services/ProductService";
+import { useProductManagement } from "../Hooks/useProductManagement";
+
 
 function ProductManager() {
-    const [products, setProducts] = useState([]);
+    const {
+        products,
+        isLoading,
+        isSaving,
+        isDeletingId,
+        jsonUploadFeedback,
+        isUploadingJson,
+        addProduct,
+        updateProduct,
+        deleteProduct,
+        uploadProductsFromJson,
+        setJsonUploadFeedback // Para permitir limpiar el feedback del JSON desde aquí
+    } = useProductManagement();
 
     const [newProduct, setNewProduct] = useState(initialProductState);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -24,14 +28,6 @@ function ProductManager() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showJsonUploadModal, setShowJsonUploadModal] = useState(false);
-
-    const [isUploadingJson, setIsUploadingJson] = useState(false); 
-    const [jsonUploadFeedback, setJsonUploadFeedback] = useState({ message: '', type: '' }); 
-
-    const [isLoading, setIsLoading] = useState(false); // Para el spinner de guardado/actualización
-    const [isDeletingId, setIsDeletingId] = useState(null); //para spinner de eliminación
-
-    const MySwal = withReactContent(Swal); // Instancia de SweetAlert2
 
     // --- Funciones para abrir/cerrar modales ---
     const handleShowAddModal = () => {
@@ -66,158 +62,34 @@ function ProductManager() {
     const handleCloseJsonUploadModal = () => setShowJsonUploadModal(false);
 
     // --- Funciones CRUD (ahora llaman al servicio) ---
-
- // Obtener productos
-    const fetchProducts = async () => {
-        setIsLoading(true); // Podrías usar un estado de carga general para la tabla
-        try {
-            const fetchedProducts = await getProductsFromDb();
-            setProducts(fetchedProducts);
-        } catch (error) {
-            console.error("Error al obtener productos:", error);
-            MySwal.fire({
-                title: "Error",
-                text: "No se pudieron cargar los productos.",
-                icon: "error",
-                confirmButtonText: "Aceptar",
-            });
-        } finally {
-            setIsLoading(false); // Finalizar carga general
+    const handleAddSubmit = async (productData) => {
+        const success = await addProduct(productData);
+        if (success) {
+            handleCloseAddModal();
         }
     };
 
-  // Agregar un producto
-  const handleAddProduct = async (productData) => { // Cambiado el nombre a 'handle'
-    try {
-        await addProductToDb(productData); // <--- Llamada al servicio
-        await fetchProducts(); // Recargar la lista
-        return true;
-    } catch (error) {
-        console.error("Error al agregar el producto:", error);
-        return false;
+    const handleEditSubmit = async (productData) => {
+        const success = await updateProduct(editingProduct.id, productData);
+        if (success) {
+            handleCloseEditModal();
+        }
+    };
+
+    const handleDeleteProduct = async (productId) => {
+        await deleteProduct(productId);
     }
-};
 
-  // Actualizar un producto
-  const handleUpdateProduct = async (id, productData) => { // Cambiado el nombre a 'handle'
-    try {
-      await updateProductInDb(id, productData); // <--- Llamada al servicio
-      await fetchProducts(); // Recargar la lista
-        return true;
-    } 
-    catch (error) {
-        console.error("Error al actualizar el producto:", error);
-        return false;
-    }
-    };
-
-  // Función para eliminar un producto
-  const handleDeleteProduct = async (id) => { // Cambiado el nombre a 'handle'
-        const result = await MySwal.fire({
-            title: "¿Estás seguro?",
-            text: "¡No podrás revertir esto!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Sí, eliminarlo",
-            cancelButtonText: "Cancelar",
-        });
-
-        if (result.isConfirmed) {
-            setIsDeletingId(id);
-            try {
-                await deleteProductFromDb(id);
-                await fetchProducts(); 
-                MySwal.fire("¡Eliminado!", "El producto ha sido eliminado.", "success");
-            } catch (error) {
-                console.error("Error al eliminar el producto:", error);
-                MySwal.fire("Error", "No se pudo eliminar el producto.", "error");
-            } finally {
-                setIsDeletingId(null);
-            }
-            }
-    };
-
-    // --- Manejador de Submit Unificado ---
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-
-        let success = false;
-        if (showAddModal) {
-            success = await handleAddProduct(newProduct);
-        } else if (showEditModal && editingProduct) {
-            success = await handleUpdateProduct(editingProduct.id, editingProduct);
-        }
-
-        setIsLoading(false);
-
-        if (!success) {
-        MySwal.fire({
-            title: "Error",
-            text: showAddModal
-            ? "Error al agregar el producto"
-            : "Error al actualizar el producto",
-            icon: "error",
-            confirmButtonText: "Aceptar",
-        });
-        } else {
-        MySwal.fire({
-            title: "Éxito",
-            text: showAddModal
-            ? "Producto agregado correctamente"
-            : "Producto actualizado correctamente",
-            icon: "success",
-            confirmButtonText: "Aceptar",
-        });
-        // Cerrar el modal correspondiente
-        showAddModal ? handleCloseAddModal() : handleCloseEditModal();
+    const handleJsonUploadSubmit = async (loadedProducts) => {
+        // No manejamos el feedback de SweetAlerts aquí, lo hace el hook
+        const result = await uploadProductsFromJson(loadedProducts);
+        // Si todo fue exitoso, cerramos el modal. Si no, el feedback queda visible.
+        if (result.failedCount === 0) {
+            handleCloseJsonUploadModal();
         }
     };
 
-    // FUNCIÓN para manejar la carga de productos desde JSON
-const handleProductsLoadedFromJson = async (loadedProducts) => {
-        setIsUploadingJson(true); // Activa el spinner de carga para el modal JSON
-        setJsonUploadFeedback({ message: '', type: '' }); // Limpia feedback previo
 
-        try {
-            const { uploadedCount, failedCount, errors } = await addProductsFromJsonToDb(loadedProducts); // Llama al servicio
-
-            if (failedCount > 0) {
-                setJsonUploadFeedback({
-                    message: `Se subieron ${uploadedCount} producto(s) con éxito, pero ${failedCount} fallaron.`,
-                    type: 'warning'
-                });
-                console.error("Detalles de errores en la subida JSON:", errors);
-                // Si hubo fallos, podríamos no cerrar el modal para que el usuario vea el mensaje de advertencia.
-                // O cerrarlo después de un breve retraso.
-                // setTimeout(() => handleCloseJsonUploadModal(), 4000); // Ejemplo: cerrar después de 4 segundos
-            } else {
-                setJsonUploadFeedback({
-                    message: `¡Éxito! Se subieron ${uploadedCount} producto(s) correctamente.`,
-                    type: 'success'
-                });
-                // Si todo fue exitoso, cerramos el modal inmediatamente
-                handleCloseJsonUploadModal(); // <--- DESCOMENTA O AÑADE ESTA LÍNEA
-            }
-            await fetchProducts(); // Recargar la lista de productos en la tabla
-        } catch (error) {
-            console.error("Error al cargar productos desde JSON:", error);
-            setJsonUploadFeedback({
-                message: `Error grave al procesar el archivo JSON: ${error.message}`,
-                type: 'danger'
-            });
-            // Si hay un error grave, podríamos no cerrar el modal o cerrarlo después de un retraso.
-            // setTimeout(() => handleCloseJsonUploadModal(), 5000);
-        } finally {
-            setIsUploadingJson(false); // Desactiva el spinner
-        }
-    };
-
-    useEffect(() => {
-        fetchProducts(); 
-    }, []);
 
     return (
         <div className="container mt-5">
@@ -245,9 +117,9 @@ const handleProductsLoadedFromJson = async (loadedProducts) => {
                 onHide={handleCloseAddModal}
                 product={newProduct}
                 setProduct={setNewProduct}
-                onSubmit={handleSubmit}
+                onSubmit={handleAddSubmit}
                 title="Agregar Nuevo Producto"
-                isLoading={isLoading}
+                isLoading={isSaving}
             />
 
         {/* Modal para Editar Producto */}
@@ -257,17 +129,18 @@ const handleProductsLoadedFromJson = async (loadedProducts) => {
                 onHide={handleCloseEditModal}
                 product={editingProduct}
                 setProduct={setEditingProduct}
-                onSubmit={handleSubmit}
+                onSubmit={handleEditSubmit}
                 title="Editar Producto"
-                isLoading={isLoading}
+                isLoading={isSaving}
             />
         )}
         {/* MODAL DE SUBIDA JSON */}
         <JsonUploadModal
             show={showJsonUploadModal}
             onHide={handleCloseJsonUploadModal}
-            onProductsLoaded={handleProductsLoadedFromJson}
+            onProductsLoaded={handleJsonUploadSubmit}
             isLoading={isUploadingJson} // Pasa el estado de carga al modal
+            setJsonUploadFeedback={setJsonUploadFeedback} // Permite limpiar el feedback desde el modal
         />
 
         {/* Tabla de productos */}
@@ -284,7 +157,14 @@ const handleProductsLoadedFromJson = async (loadedProducts) => {
             </tr>
             </thead>
             <tbody>
-            {products.length === 0 ? (
+            {isLoading ? ( // Use isLoading from the hook
+                    <tr>
+                        <td colSpan="7" className="text-center">
+                            <Spinner animation="border" role="status" className="me-2" />
+                            Cargando productos...
+                        </td>
+                    </tr>
+                ) :products.length === 0 ? (
                 <tr>
                 <td colSpan="7" className="text-center">
                     No hay productos disponibles.

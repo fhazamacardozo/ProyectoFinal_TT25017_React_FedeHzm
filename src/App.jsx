@@ -8,7 +8,6 @@ import Header from './Components/Header';
 import NavBar from './Components/NavBar';
 import Footer from './Components/Footer';
 import { ProtectedRoute, AdminRoute } from './Components/ProtectedRoute';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from './Context/AuthContext';
 import Register from './Pages/Register';
 import ProductManager from './Pages/ProductManager';

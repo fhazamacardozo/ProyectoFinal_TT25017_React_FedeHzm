@@ -1,5 +1,4 @@
-import Card from "./Card";
-
+import ProductCard from "./ProductCard";
 function CardList({ items, buttonText, onClick_ = () => {} }) {
 
     return(
@@ -13,7 +12,7 @@ function CardList({ items, buttonText, onClick_ = () => {} }) {
         >
             {items.map((item) => 
                 (
-                    <Card 
+                    <ProductCard
                         key={item.id}
                         item={item}
                         buttonText={buttonText}

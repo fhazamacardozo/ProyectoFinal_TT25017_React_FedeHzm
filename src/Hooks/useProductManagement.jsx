@@ -19,10 +19,12 @@ export const useProductManagement = () => {
     const [isDeletingId, setIsDeletingId] = useState(null); // Para spinner de eliminación
     const [jsonUploadFeedback, setJsonUploadFeedback] = useState({ message: '', type: '' });
     const [isUploadingJson, setIsUploadingJson] = useState(false); // Para el spinner del modal JSON
+    const [error, setError] = useState(null); 
 
     // --- Lógica para obtener productos (useEffect) ---
     const fetchProducts = useCallback(async () => {
         setIsLoading(true);
+        setError(null); // Resetea el error antes de la carga
         try {
             const fetchedProducts = await getProductsFromDb();
             setProducts(fetchedProducts);
@@ -34,6 +36,7 @@ export const useProductManagement = () => {
                 icon: "error",
                 confirmButtonText: "Aceptar",
             });
+            setError("Error al obtener productos:",error); 
         } finally {
             setIsLoading(false);
         }
@@ -162,6 +165,7 @@ export const useProductManagement = () => {
     return {
         products,
         isLoading,
+        error,
         isSaving,
         isDeletingId,
         jsonUploadFeedback,

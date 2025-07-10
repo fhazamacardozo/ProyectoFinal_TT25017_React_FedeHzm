@@ -1,5 +1,5 @@
 import { useState, useContext, } from "react";
-import { Container } from "react-bootstrap";
+import { Container, Row, Col, Button, Offcanvas } from "react-bootstrap";
 import CardList from "../Components/CardList";
 import { CartContext } from "../Context/CartContext";
 import { useAuth } from "../Context/AuthContext"; 
@@ -7,7 +7,7 @@ import { useProductManagement } from "../Hooks/useProductManagement";
 import ProductDetailModal from "../Components/ProductDetailModal";
 import ProductFilterAndSortSidebar from "../Components/ProductFilterAndSortSidebar";
 import SearchBar from "../Components/SearchBar";
-import { Row, Col } from "react-bootstrap";
+import { FaFilter } from "react-icons/fa";
 
 function Catalogue() {
    // States for search, filter, and sort
@@ -16,6 +16,9 @@ function Catalogue() {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedRating, setSelectedRating] = useState(0); // 0 means no minimum rating
     const [sortOption, setSortOption] = useState(''); // e.g., 'name_asc', 'price_desc'
+
+    // State for Offcanvas visibility
+    const [showOffcanvas, setShowOffcanvas] = useState(false);
 
     // Destructure properties from your custom hook, passing in filter/sort parameters
     const { products, categories, isLoading, error } = useProductManagement(
@@ -52,7 +55,12 @@ function Catalogue() {
         setSelectedCategory('');
         setSelectedRating(0);
         setSortOption('');
+        setShowOffcanvas(false);
     };
+
+    // Handlers for Offcanvas
+    const handleOffcanvasClose = () => setShowOffcanvas(false);
+    const handleOffcanvasShow = () => setShowOffcanvas(true);
 
     if (isLoading) {
         return (
@@ -82,7 +90,7 @@ function Catalogue() {
             </header>
 
             <Row>
-                <Col md={3}>
+                <Col md={3} className="d-none d-md-block">
                     {/* Sidebar for Filters and Sort */}
                     <ProductFilterAndSortSidebar
                         categories={categories}
@@ -95,7 +103,16 @@ function Catalogue() {
                         onClearFilters={handleClearFilters}
                     />
                 </Col>
-                <Col md={9}>
+
+                <Col xs={12} md={9}> {/* xs=12 ensures it takes full width on small screens */}
+                    {/* Filter Button for Mobile - Visible on small screens (md-down) */}
+                    <div className="d-md-none mb-3 text-center">
+                        <Button variant="outline-primary" onClick={handleOffcanvasShow}>
+                            <FaFilter className="me-2" />
+                            Mostrar Filtros
+                        </Button>
+                    </div>
+
                     {/* Search Bar */}
                     <SearchBar
                         searchTerm={searchTerm}
@@ -116,7 +133,36 @@ function Catalogue() {
                     </section>
                 </Col>
             </Row>
-
+            {/* Offcanvas for Filters - Visible on small screens (md-down) */}{/* Offcanvas for Mobile Filters */}
+            <Offcanvas show={showOffcanvas} onHide={handleOffcanvasClose} placement="start" responsive="md">
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>Filtros de Productos</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                    <ProductFilterAndSortSidebar
+                        categories={categories}
+                        selectedCategory={selectedCategory}
+                        onCategoryChange={(cat) => {
+                            setSelectedCategory(cat);
+                            handleOffcanvasClose(); // Optionally close offcanvas after selection
+                        }}
+                        selectedRatingExclusive={selectedRating}
+                        onRatingChangeExclusive={(rating) => {
+                            setSelectedRating(rating);
+                            handleOffcanvasClose(); // Optionally close offcanvas after selection
+                        }}
+                        sortOption={sortOption}
+                        onSortChange={(sort) => {
+                            setSortOption(sort);
+                            handleOffcanvasClose(); // Optionally close offcanvas after selection
+                        }}
+                        onClearFilters={() => {
+                            handleClearFilters();
+                            handleOffcanvasClose(); // Always close after clearing
+                        }}
+                    />
+                </Offcanvas.Body>
+            </Offcanvas>           
            {/* Product Detail Modal */}
             <ProductDetailModal
                 show={isModalOpen}

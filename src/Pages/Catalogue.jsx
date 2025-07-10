@@ -1,9 +1,6 @@
 import { useState, useContext, } from "react";
 import { Container } from "react-bootstrap";
 import CardList from "../Components/CardList";
-// IMPORTAR MODAL DE REACT-BOOTSTRAP
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button'; 
 import { CartContext } from "../Context/CartContext";
 import { useAuth } from "../Context/AuthContext"; 
 import { useProductManagement } from "../Hooks/useProductManagement";

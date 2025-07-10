@@ -38,7 +38,7 @@ function Login() {
 
     return (
         <Container className="py-4">
-            <h1 className="text-center">Login</h1>
+            <h1 className="text-center">Ingresar</h1>
             <Form onSubmit={handleSubmit} className="w-50 mx-auto">
                 <Form.Group controlId="formBasicEmail" className="mb-3">
                     <Form.Label>Email</Form.Label>
@@ -46,7 +46,7 @@ function Login() {
                 </Form.Group>
 
                 <Form.Group controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
+                    <Form.Label>Contraseña</Form.Label>
                     <Form.Control type="password" placeholder="Password" name="password" required />
                 </Form.Group>
 

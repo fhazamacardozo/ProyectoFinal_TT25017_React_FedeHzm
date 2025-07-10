@@ -45,20 +45,20 @@ function Register() {
 
     return (
         <Container className="py-4">
-            <h1 className="text-center">Register</h1>
+            <h1 className="text-center">Registro</h1>
             <Form onSubmit={handleSubmit} className="w-50 mx-auto">
                 <Form.Group controlId="formBasicUsername" className="mb-3">
-                    <Form.Label>Username</Form.Label>
+                    <Form.Label>Nombre de usuario</Form.Label>
                     <Form.Control type="text" placeholder="Enter username" name="username" required />
                 </Form.Group>
                 
                 <Form.Group controlId="formBasicFirstName" className="mb-3">
-                    <Form.Label>First Name</Form.Label>
+                    <Form.Label>Nombre</Form.Label>
                     <Form.Control type="text" placeholder="Enter first name" name="firstName" required />
                 </Form.Group>
 
                 <Form.Group controlId="formBasicLastName" className="mb-3">
-                    <Form.Label>Last Name</Form.Label>
+                    <Form.Label>Apellido</Form.Label>
                     <Form.Control type="text" placeholder="Enter last name" name="lastName" required />
                 </Form.Group>
 
@@ -68,7 +68,7 @@ function Register() {
                 </Form.Group>
 
                 <Form.Group controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
+                    <Form.Label>Contraseña</Form.Label>
                     <Form.Control type="password" placeholder="Password" name="password" required />
                 </Form.Group>
                 <Button className="mt-3" variant="primary" type="submit" disabled={isLoading}>
@@ -85,7 +85,7 @@ function Register() {
                             Cargando...
                         </>
                     ) : (
-                        "Register"
+                        "Registrarse"
                     )}
                 </Button>
             </Form>

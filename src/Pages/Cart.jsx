@@ -1,7 +1,8 @@
 import { useContext } from "react";
 import { Container, Table, Button, Row, Col, Card } from "react-bootstrap";
 import { CartContext } from "../Context/CartContext";
-import { FaTrash, FaShoppingCart } from "react-icons/fa"; // Importar iconos
+import { FaTrash, FaShoppingCart } from "react-icons/fa"; 
+import { Link } from 'react-router-dom';
 
 function Cart() {
     const { cartItems = [], removeFromCart, clearCart, calculateTotal } = useContext(CartContext);
@@ -13,9 +14,9 @@ function Cart() {
                 <h2 className="text-primary mb-4">Tu Carrito de Compras</h2>
                 <FaShoppingCart size={80} className="text-muted mb-3" />
                 <p className="lead text-muted">¡Tu carrito está vacío! Explora nuestro catálogo para llenarlo.</p>
-                <Button variant="primary" href="/catalogue" className="mt-3">
+                <Link to="/Catalogue" className="btn btn-primary mt-3">
                     Ir al Catálogo
-                </Button>
+                </Link>
             </Container>
         );
     }

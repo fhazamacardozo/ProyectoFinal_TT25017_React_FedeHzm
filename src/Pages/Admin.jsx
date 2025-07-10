@@ -1,6 +1,3 @@
-//Admin.jsx 
-// This component is used to display the admin page. It shows the user name retrieved from params
-
 import { useParams } from "react-router-dom";
 import { Container } from "react-bootstrap";
 

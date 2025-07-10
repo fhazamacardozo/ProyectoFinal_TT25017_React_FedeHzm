@@ -52,6 +52,5 @@ function Cart() {
         </Container>
     );
 };
-// Función para calcular el total del carrito
 
 export default Cart;

@@ -8,6 +8,7 @@ import ProductDetailModal from "../Components/ProductDetailModal";
 import ProductFilterAndSortSidebar from "../Components/ProductFilterAndSortSidebar";
 import SearchBar from "../Components/SearchBar";
 import { FaFilter } from "react-icons/fa";
+import MobileFilterOffcanvas from "../Components/MobileFilterOffcanvas";
 
 function Catalogue() {
    // States for search, filter, and sort
@@ -133,36 +134,22 @@ function Catalogue() {
                     </section>
                 </Col>
             </Row>
-            {/* Offcanvas for Filters - Visible on small screens (md-down) */}{/* Offcanvas for Mobile Filters */}
-            <Offcanvas show={showOffcanvas} onHide={handleOffcanvasClose} placement="start" responsive="md">
-                <Offcanvas.Header closeButton>
-                    <Offcanvas.Title>Filtros de Productos</Offcanvas.Title>
-                </Offcanvas.Header>
-                <Offcanvas.Body>
-                    <ProductFilterAndSortSidebar
-                        categories={categories}
-                        selectedCategory={selectedCategory}
-                        onCategoryChange={(cat) => {
-                            setSelectedCategory(cat);
-                            handleOffcanvasClose(); // Optionally close offcanvas after selection
-                        }}
-                        selectedRatingExclusive={selectedRating}
-                        onRatingChangeExclusive={(rating) => {
-                            setSelectedRating(rating);
-                            handleOffcanvasClose(); // Optionally close offcanvas after selection
-                        }}
-                        sortOption={sortOption}
-                        onSortChange={(sort) => {
-                            setSortOption(sort);
-                            handleOffcanvasClose(); // Optionally close offcanvas after selection
-                        }}
-                        onClearFilters={() => {
-                            handleClearFilters();
-                            handleOffcanvasClose(); // Always close after clearing
-                        }}
-                    />
-                </Offcanvas.Body>
-            </Offcanvas>           
+            
+            {/* Mobile Filter Offcanvas Component */}
+            <MobileFilterOffcanvas
+                show={showOffcanvas}
+                onHide={handleOffcanvasClose}
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                selectedRatingExclusive={selectedRating}
+                onRatingChangeExclusive={setSelectedRating}
+                sortOption={sortOption}
+                onSortChange={setSortOption}
+                onClearFilters={handleClearFilters}
+            />
+
+
            {/* Product Detail Modal */}
             <ProductDetailModal
                 show={isModalOpen}

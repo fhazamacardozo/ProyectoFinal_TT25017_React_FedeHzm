@@ -69,11 +69,8 @@ export const useProductManagement = (searchTerm = '', selectedCategory = '', sel
 
         // 3. Rating Filter
         if (selectedRating > 0) {
-            // If selectedRatingExclusive is 2, filter for products with rate >= 2 and rate < 3
-            // If selectedRatingExclusive is 5, filter for products with rate >= 5 (since max is 5)
             filteredAndSortedProducts = filteredAndSortedProducts.filter(product =>
-                product.rating.rate >= selectedRating &&
-                product.rating.rate < (selectedRating === 5 ? 5.1 : selectedRating + 1) // Handles 5-star case
+                product.rating.rate >= selectedRating
             );
         }
 

@@ -1,23 +1,32 @@
+import { Card,Button } from 'react-bootstrap'; 
 import styles from './ProductCard.module.css';
-import Button from "./Button";
+
 
 function ProductCard({ item, buttonText, onClick_ }) {
     return (
-        <div className={styles.card} key={item.id}>
-            <div className={styles['image-container']}> {/* Notación de corchetes para nombres con guiones */}
-                <img src={item.image} alt={item.title} />
-            </div>
-            <h6>{item.title}</h6>
-            <p className={styles.price}>${item.price}</p>
-            <p className={styles.category}>{item.category}</p>
-            <p className={styles.rating} >Rating: {item.rating.rate} ({item.rating.count})</p>
-            {buttonText && (
-                <Button
-                    text={buttonText}
-                    onClick={onClick_}
-                />
-            )}
-        </div>
+
+        <Card className={`h-100 ${styles.customCard}`}> 
+            <Card.Img
+                variant="top" 
+                src={item.image}
+                alt={item.title}
+                className={styles.cardImage} 
+            />
+            <Card.Body className="d-flex flex-column">
+                <Card.Title as="h6" className={styles.cardTitle}>
+                    {item.title}
+                </Card.Title>
+                <Card.Text className={styles.price}>${item.price}</Card.Text>
+                <Card.Text className={styles.category}>{item.category}</Card.Text>
+                <Card.Text className={styles.rating}>Rating: {item.rating.rate} ({item.rating.count})</Card.Text>
+
+                {buttonText && (
+                    <Button variant="primary" className="mt-auto w-100" onClick={onClick_}>
+                        {buttonText}
+                    </Button>
+                )}
+            </Card.Body>
+        </Card>
     );
 }
 

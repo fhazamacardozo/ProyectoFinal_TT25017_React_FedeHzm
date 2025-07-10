@@ -1,27 +1,21 @@
+import { Row, Col } from 'react-bootstrap'; 
 import ProductCard from "./ProductCard";
-function CardList({ items, buttonText, onClick_ = () => {} }) {
 
+function CardList({ items, buttonText, onClick_ = () => {} }) {
     return(
-        <div style={{
-                display: 'flex', 
-                flexWrap: 'wrap',
-                gap: '20px',
-                padding: '20px',
-                justifyContent: 'center'                
-            }}
-        >
-            {items.map((item) => 
+        <Row xs={1} sm={2} md={3} lg={4} className="g-4 justify-content-center"> 
+            {items.map((item) =>
                 (
-                    <ProductCard
-                        key={item.id}
-                        item={item}
-                        buttonText={buttonText}
-                        onClick_={() => onClick_(item)}
-                    />
+                    <Col key={item.id}>
+                        <ProductCard
+                            item={item}
+                            buttonText={buttonText}
+                            onClick_={() => onClick_(item)}
+                        />
+                    </Col>
                 )
-            )
-        }
-        </div>
+            )}
+        </Row>
     )
 }
 

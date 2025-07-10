@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback,  useMemo } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import {
@@ -12,8 +12,8 @@ import {
 
 const MySwal = withReactContent(Swal); // Instancia de SweetAlert2
 
-export const useProductManagement = () => {
-    const [products, setProducts] = useState([]);
+export const useProductManagement = (searchTerm = '', selectedCategory = '', selectedRating = 0, sortOption = '') => {
+    const [allProducts, setAllProducts] = useState([]); // Store all original products
     const [isSaving, setIsSaving] = useState(false); // Para spinner de guardado
     const [isLoading, setIsLoading] = useState(true); // Carga inicial de la tabla
     const [isDeletingId, setIsDeletingId] = useState(null); // Para spinner de eliminación
@@ -27,7 +27,7 @@ export const useProductManagement = () => {
         setError(null); // Resetea el error antes de la carga
         try {
             const fetchedProducts = await getProductsFromDb();
-            setProducts(fetchedProducts);
+            setAllProducts(fetchedProducts);
         } catch (error) {
             console.error("Error al obtener productos:", error);
             MySwal.fire({
@@ -45,6 +45,68 @@ export const useProductManagement = () => {
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]); // Se ejecuta al montar el componente o si fetchProducts cambia (que no debería)
+
+     // --- Filtering and Sorting Logic ---
+    const products = useMemo(() => {
+        let filteredAndSortedProducts = [...allProducts]; // Start with a copy of all products
+
+        // 1. Search Filter
+        if (searchTerm) {
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+            filteredAndSortedProducts = filteredAndSortedProducts.filter(product =>
+                product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
+                product.description.toLowerCase().includes(lowerCaseSearchTerm) ||
+                product.category.toLowerCase().includes(lowerCaseSearchTerm)
+            );
+        }
+
+        // 2. Category Filter
+        if (selectedCategory) {
+            filteredAndSortedProducts = filteredAndSortedProducts.filter(product =>
+                product.category === selectedCategory
+            );
+        }
+
+        // 3. Rating Filter
+        if (selectedRating > 0) {
+            // If selectedRatingExclusive is 2, filter for products with rate >= 2 and rate < 3
+            // If selectedRatingExclusive is 5, filter for products with rate >= 5 (since max is 5)
+            filteredAndSortedProducts = filteredAndSortedProducts.filter(product =>
+                product.rating.rate >= selectedRating &&
+                product.rating.rate < (selectedRating === 5 ? 5.1 : selectedRating + 1) // Handles 5-star case
+            );
+        }
+
+        // 4. Sorting
+        if (sortOption) {
+            filteredAndSortedProducts.sort((a, b) => {
+                switch (sortOption) {
+                    case 'name_asc':
+                        return a.title.localeCompare(b.title);
+                    case 'name_desc':
+                        return b.title.localeCompare(a.title);
+                    case 'price_asc':
+                        return a.price - b.price;
+                    case 'price_desc':
+                        return b.price - a.price;
+                    case 'rating_desc':
+                        return b.rating.rate - a.rating.rate;
+                    case 'rating_asc':
+                        return a.rating.rate - b.rating.rate;
+                    default:
+                        return 0;
+                }
+            });
+        }
+
+        return filteredAndSortedProducts;
+    }, [allProducts, searchTerm, selectedCategory, selectedRating, sortOption]);
+
+    // Extract unique categories for the sidebar
+    const categories = useMemo(() => {
+        const uniqueCategories = new Set(allProducts.map(product => product.category));
+        return Array.from(uniqueCategories).sort();
+    }, [allProducts]);
 
     // --- Lógica para añadir producto ---
     const addProduct = async (productData) => {
@@ -163,18 +225,20 @@ export const useProductManagement = () => {
     };
 
     return {
-        products,
+        products, // This is now the filtered and sorted list
+        allProducts, // The original, unfiltered list 
+        categories, // Unique categories for filtering
         isLoading,
         error,
         isSaving,
         isDeletingId,
         jsonUploadFeedback,
         isUploadingJson,
-        fetchProducts, // aunque el useEffect ya lo llama, puede ser útil si quieres refetch manual
+        fetchProducts,
         addProduct,
         updateProduct,
         deleteProduct,
         uploadProductsFromJson,
-        setJsonUploadFeedback // Permite al componente padre resetear el feedback si lo necesita
+        setJsonUploadFeedback
     };
 };

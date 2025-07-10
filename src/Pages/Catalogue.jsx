@@ -5,9 +5,25 @@ import { CartContext } from "../Context/CartContext";
 import { useAuth } from "../Context/AuthContext"; 
 import { useProductManagement } from "../Hooks/useProductManagement";
 import ProductDetailModal from "../Components/ProductDetailModal";
+import ProductFilterAndSortSidebar from "../Components/ProductFilterAndSortSidebar";
+import SearchBar from "../Components/SearchBar";
+import { Row, Col } from "react-bootstrap";
 
 function Catalogue() {
-    const { products, isLoading, error } = useProductManagement();
+   // States for search, filter, and sort
+    const [searchTerm, setSearchTerm] = useState('');
+    const [appliedSearchTerm, setAppliedSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedRating, setSelectedRating] = useState(0); // 0 means no minimum rating
+    const [sortOption, setSortOption] = useState(''); // e.g., 'name_asc', 'price_desc'
+
+    // Destructure properties from your custom hook, passing in filter/sort parameters
+    const { products, categories, isLoading, error } = useProductManagement(
+        appliedSearchTerm,
+        selectedCategory,
+        selectedRating,
+        sortOption
+    );
 
     const { isAuthenticated } = useAuth();
     const { addToCart } = useContext(CartContext);
@@ -24,6 +40,18 @@ function Catalogue() {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setSelectedItem(null);
+    };
+
+    const handleSearchSubmit = () => {
+        setAppliedSearchTerm(searchTerm); // Apply search only when button is clicked or Enter is pressed
+    };
+
+    const handleClearFilters = () => {
+        setSearchTerm('');
+        setAppliedSearchTerm('');
+        setSelectedCategory('');
+        setSelectedRating(0);
+        setSortOption('');
     };
 
     if (isLoading) {
@@ -53,14 +81,41 @@ function Catalogue() {
                 <p className="lead text-muted">Explora nuestros productos destacados.</p>
             </header>
 
-            <section className="mb-5">
-                <h2 className="text-primary mb-4 text-center">Productos</h2>
-                <CardList 
-                    items={products} 
-                    buttonText="Ver Detalles"
-                    onClick_={handleOpenModal}
-                />
-            </section>
+            <Row>
+                <Col md={3}>
+                    {/* Sidebar for Filters and Sort */}
+                    <ProductFilterAndSortSidebar
+                        categories={categories}
+                        selectedCategory={selectedCategory}
+                        onCategoryChange={setSelectedCategory}
+                        selectedRating={selectedRating}
+                        onRatingChange={setSelectedRating}
+                        sortOption={sortOption}
+                        onSortChange={setSortOption}
+                        onClearFilters={handleClearFilters}
+                    />
+                </Col>
+                <Col md={9}>
+                    {/* Search Bar */}
+                    <SearchBar
+                        searchTerm={searchTerm}
+                        onSearchChange={setSearchTerm}
+                        onSearchSubmit={handleSearchSubmit}
+                    />
+
+                    <section className="mb-5">
+                        <h2 className="text-primary mb-4 text-center">Productos</h2>
+                        {products.length === 0 && (
+                            <p className="text-center text-muted">No se encontraron productos con los filtros aplicados.</p>
+                        )}
+                        <CardList
+                            items={products}
+                            buttonText="Ver Detalles"
+                            onClick_={handleOpenModal}
+                        />
+                    </section>
+                </Col>
+            </Row>
 
            {/* Product Detail Modal */}
             <ProductDetailModal

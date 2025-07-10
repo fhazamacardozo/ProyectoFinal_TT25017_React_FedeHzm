@@ -1,15 +1,15 @@
-
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaReact, FaBootstrap } from 'react-icons/fa';
-import { IoLogoJavascript, IoLogoFirebase } from 'react-icons/io5'; // More icons
+import { IoLogoJavascript, IoLogoFirebase } from 'react-icons/io5'; 
+import { MdSecurity } from 'react-icons/md'; 
 
 function Home() {
     return (
         <Container className="my-5">
             {/* Título Principal y Descripción - Centrado y ancho limitado en grandes pantallas */}
             <Row className="justify-content-center mb-5">
-                <Col xs={12} md={10} lg={8} className="text-center"> 
+                <Col xs={12} md={10} lg={8} className="text-center">
                     <h1 className="display-4 fw-bold text-primary mb-3">Bienvenido a Nuestro E-commerce Demo</h1>
                     <p className="lead text-muted">
                         Explora un catálogo de productos interactivo, gestiona tu carrito de compras y descubre la administración de productos.
@@ -36,14 +36,14 @@ function Home() {
                 </Col>
             </Row>
 
-            {/* Technologies Used - REFINED SECTION */}
+            {/* Technologies Used */}
             <Row className="mb-5">
-                <Col xs={12}> 
+                <Col xs={12}>
                     <Card className="shadow-sm">
                         <Card.Body>
                             <Card.Title as="h2" className="text-secondary mb-3">Tecnologías Utilizadas</Card.Title>
                             <Row className="text-center d-flex align-items-stretch g-3">
-                                <Col xs={12} sm={6} md={3}> 
+                                <Col xs={12} sm={6} md={3}>
                                     <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
                                         <FaReact size={40} className="text-info mb-2" />
                                         <p className="fw-bold mb-0">React.js</p>
@@ -59,14 +59,14 @@ function Home() {
                                 </Col>
                                 <Col xs={12} sm={6} md={3}>
                                     <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
-                                        <FaBootstrap size={40} className="text-purple mb-2" />
+                                        <FaBootstrap size={40} className="text-purple mb-2" /> {/* Asegúrate de definir text-purple en tu CSS si no es de Bootstrap */}
                                         <p className="fw-bold mb-0">React-Bootstrap</p>
                                         <small className="text-muted">Framework de UI</small>
                                     </div>
                                 </Col>
                                 <Col xs={12} sm={6} md={3}>
                                     <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
-                                        <IoLogoFirebase size={40} className="text-orange mb-2" />
+                                        <IoLogoFirebase size={40} className="text-orange mb-2" /> {/* Asegúrate de definir text-orange en tu CSS si no es de Bootstrap */}
                                         <p className="fw-bold mb-0">Firebase/Firestore</p>
                                         <small className="text-muted">Backend as a Service</small>
                                     </div>
@@ -102,35 +102,43 @@ function Home() {
                 </Col>
             </Row>
 
-            {/* Admin Credentials */}
+            {/* Authentication and Admin Credentials */}
             <Row className="mb-5">
-                <Col xs={12}> 
-                    <Card className="shadow-sm border-warning">
+                <Col xs={12}>
+                    <Card className="shadow-sm border-primary"> 
                         <Card.Body>
-                            <Card.Title as="h2" className="text-danger mb-3">Credenciales de Acceso para Administración (ABM)</Card.Title>
+                            <Card.Title as="h2" className="text-primary mb-3 d-flex align-items-center">
+                                <MdSecurity size={30} className="me-2" />
+                                Autenticación y Administración de Usuarios
+                            </Card.Title>
                             <Card.Text>
-                                Para acceder a la sección de Administración de Productos (ABM) y probar las funciones de
-                                agregar, editar y eliminar productos, utiliza las siguientes credenciales:
-                                <br/><br/>
-                                <strong>Email:</strong> <code>admin@admin.com</code><br/>
-                                <strong>Contraseña:</strong> <code>adminadmin</code>
-                                <br/><br/>
-                                Una vez iniciada sesión con estas credenciales, podrás ver y acceder a la sección de ABM
-                                de productos.
+                                Este proyecto incorpora un sistema de autenticación de usuarios robusto utilizando <strong>Firebase Authentication (basado en correo electrónico y contraseña)</strong>.
+                                Esto permite a los usuarios <strong>registrarse</strong> con nuevas cuentas y <strong>iniciar sesión</strong> para acceder a diferentes funcionalidades.
+                            </Card.Text>
+                            <Card.Text className="mb-3">
+                                Para probar la sección de <strong>Administración de Productos (ABM)</strong>, que permite agregar, editar y eliminar productos, puedes utilizar las siguientes credenciales de administrador:
+                            </Card.Text>
+                            <div className="bg-light p-3 rounded mb-3 border"> 
+                                <p className="mb-1"><strong>Email:</strong> <code>admin@admin.com</code></p>
+                                <p className="mb-0"><strong>Contraseña:</strong> <code>adminadmin</code></p>
+                            </div>
+                            <Card.Text className="small text-muted">
+                                * Una vez iniciada sesión con estas credenciales, tendrás acceso a las funcionalidades de ABM.
+                                Puedes cerrar sesión en cualquier momento y registrarte como un usuario normal para explorar la experiencia de compra.
                             </Card.Text>
                         </Card.Body>
                     </Card>
                 </Col>
             </Row>
 
-            {/* Navigation Links - Ajuste para botones en móviles */}
+            {/* Navigation Links  */}
             <Row className="mt-4 justify-content-center g-3">
                 <Col xs={12} sm={6} md={4} className="text-center">
                     <Link to="/Catalogue" className="btn btn-primary btn-lg w-75">
                         Ir al Catálogo
                     </Link>
                 </Col>
-                <Col xs={12} sm={6} md={4} className="text-center"> 
+                <Col xs={12} sm={6} md={4} className="text-center">
                     <Link to="/Cart" className="btn btn-info btn-lg w-75">
                         Ir al Carrito
                     </Link>

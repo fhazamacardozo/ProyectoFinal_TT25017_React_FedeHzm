@@ -14,7 +14,7 @@ function MobileFilterOffcanvas({
     onClearFilters
 }) {
     return (
-        <Offcanvas show={show} onHide={onHide} placement="start" responsive="md">
+        <Offcanvas show={show} onHide={onHide} placement="start" >
             <Offcanvas.Header closeButton>
                 <Offcanvas.Title>Filtros de Productos</Offcanvas.Title>
             </Offcanvas.Header>

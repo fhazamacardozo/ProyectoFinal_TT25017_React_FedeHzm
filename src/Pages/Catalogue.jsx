@@ -4,6 +4,7 @@ import CardList from "../Components/product/CardList";
 import { CartContext } from "../Context/CartContext";
 import { useAuth } from "../Context/AuthContext"; 
 import { useProductManagement } from "../Hooks/useProductManagement";
+import { useHandleAddToCart } from "../Hooks/useHandleAddToCart";
 import ProductDetailModal from "../Components/product/ProductDetailModal";
 import ProductFilterAndSortSidebar from "../Components/product/ProductFilterAndSortSidebar";
 import SearchBar from "../Components/common/SearchBar";
@@ -11,8 +12,9 @@ import { FaFilter } from "react-icons/fa";
 import MobileFilterOffcanvas from "../Components/product/MobileFilterOffcanvas";
 import { Title, Meta } from 'react-head'; 
 
+
 function Catalogue() {
-   // States for search, filter, and sort
+    // States for search, filter, and sort
     const [searchTerm, setSearchTerm] = useState('');
     const [appliedSearchTerm, setAppliedSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -32,6 +34,9 @@ function Catalogue() {
 
     const { isAuthenticated } = useAuth();
     const { addToCart } = useContext(CartContext);
+
+    // Handler for Add to Cart button using shared hook (must be before any early return)
+    const handleAddToCart = useHandleAddToCart(addToCart, isAuthenticated);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -84,6 +89,9 @@ function Catalogue() {
         );
     }
 
+
+
+
     return (
         <Container fluid className="py-4 bg-light">
             <header className="text-center mb-4">
@@ -132,7 +140,8 @@ function Catalogue() {
                         <CardList
                             items={products}
                             buttonText="Ver Detalles"
-                            onClick_={handleOpenModal}
+                            onShowDetails={handleOpenModal}
+                            onAddToCart={handleAddToCart}
                         />
                     </section>
                 </Col>

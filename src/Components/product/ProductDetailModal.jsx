@@ -1,9 +1,6 @@
 import { Modal, Button } from 'react-bootstrap';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-import { useNavigate } from 'react-router-dom';
 
-const MySwal = withReactContent(Swal);
+import { useHandleAddToCart } from '../../Hooks/useHandleAddToCart';
 
 function ProductDetailModal({
     show,
@@ -12,7 +9,8 @@ function ProductDetailModal({
     addToCart,
     isAuthenticated
 }) {
-    const navigate = useNavigate();
+
+    const handleAddToCart = useHandleAddToCart(addToCart, isAuthenticated, onHide);
 
     // Function to render stars based on rating
     const renderStars = (rate) => {
@@ -33,25 +31,7 @@ function ProductDetailModal({
         return stars;
     };
 
-    const handleAddToCart = () => {
-        if (isAuthenticated) {
-            addToCart(selectedItem);
-            onHide(); // Close modal after adding to cart
-        } else {
-            MySwal.fire({
-                title: 'Inicia sesión para agregar al carrito',
-                text: 'Por favor, inicia sesión para poder agregar productos al carrito.',
-                icon: 'warning',
-                confirmButtonText: 'Iniciar Sesión',
-                cancelButtonText: 'Cancelar',
-                showCancelButton: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    navigate('/login');
-                }
-            });
-        }
-    };
+
 
     if (!selectedItem) {
         return null; // Don't render modal if no item is selected
@@ -93,7 +73,7 @@ function ProductDetailModal({
                 <Button variant="secondary" onClick={onHide}>
                     Cerrar
                 </Button>
-                <Button variant="primary" onClick={handleAddToCart}>
+                <Button variant="primary" onClick={() => handleAddToCart(selectedItem)}>
                     Agregar al carrito
                 </Button>
             </Modal.Footer>

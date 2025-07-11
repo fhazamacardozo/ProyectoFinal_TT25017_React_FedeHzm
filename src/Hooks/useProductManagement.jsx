@@ -14,7 +14,7 @@ const MySwal = withReactContent(Swal); // Instancia de SweetAlert2
 
 export const useProductManagement = (
     searchTerm = '',
-    selectedCategory = '',
+    selectedCategories = [],
     selectedRating = 0,
     sortOption = '',
     currentPage = 1,
@@ -67,10 +67,10 @@ export const useProductManagement = (
             );
         }
 
-        // 2. Category Filter
-        if (selectedCategory) {
+        // 2. Category Filter (multi)
+        if (selectedCategories && selectedCategories.length > 0) {
             filteredAndSortedProducts = filteredAndSortedProducts.filter(product =>
-                product.category === selectedCategory
+                selectedCategories.includes(product.category)
             );
         }
 
@@ -116,7 +116,7 @@ export const useProductManagement = (
             totalProducts,
             filteredAndSortedProducts // for infinite scroll
         };
-    }, [allProducts, searchTerm, selectedCategory, selectedRating, sortOption, currentPage, pageSize]);
+    }, [allProducts, searchTerm, selectedCategories, selectedRating, sortOption, currentPage, pageSize]);
 
     // Extract unique categories for the sidebar
     const categories = useMemo(() => {

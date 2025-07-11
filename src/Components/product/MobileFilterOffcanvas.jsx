@@ -5,7 +5,7 @@ function MobileFilterOffcanvas({
     show,
     onHide,
     categories,
-    selectedCategory,
+    selectedCategories,
     onCategoryChange,
     selectedRating,
     onRatingChange,
@@ -13,6 +13,24 @@ function MobileFilterOffcanvas({
     onSortChange,
     onClearFilters
 }) {
+    // Handlers para cerrar el offcanvas al cambiar cualquier filtro
+    const handleCategoryChange = (cats) => {
+        onCategoryChange(cats);
+        onHide();
+    };
+    const handleRatingChange = (rating) => {
+        onRatingChange(rating);
+        onHide();
+    };
+    const handleSortChange = (sort) => {
+        onSortChange(sort);
+        onHide();
+    };
+    const handleClearFilters = () => {
+        onClearFilters();
+        onHide();
+    };
+
     return (
         <Offcanvas show={show} onHide={onHide} placement="start" >
             <Offcanvas.Header closeButton>
@@ -21,25 +39,13 @@ function MobileFilterOffcanvas({
             <Offcanvas.Body>
                 <ProductFilterAndSortSidebar
                     categories={categories}
-                    selectedCategory={selectedCategory}
-                    onCategoryChange={(cat) => {
-                        onCategoryChange(cat);
-                        onHide(); // Close offcanvas after selection
-                    }}
-                    selectedRatingExclusive={selectedRating}
-                    onRatingChangeExclusive={(rating) => {
-                        onRatingChange(rating);
-                        onHide(); // Close offcanvas after selection
-                    }}
+                    selectedCategories={selectedCategories}
+                    onCategoryChange={handleCategoryChange}
+                    selectedRating={selectedRating}
+                    onRatingChange={handleRatingChange}
                     sortOption={sortOption}
-                    onSortChange={(sort) => {
-                        onSortChange(sort);
-                        onHide(); // Close offcanvas after selection
-                    }}
-                    onClearFilters={() => {
-                        onClearFilters();
-                        onHide(); // Always close after clearing
-                    }}
+                    onSortChange={handleSortChange}
+                    onClearFilters={handleClearFilters}
                 />
             </Offcanvas.Body>
         </Offcanvas>

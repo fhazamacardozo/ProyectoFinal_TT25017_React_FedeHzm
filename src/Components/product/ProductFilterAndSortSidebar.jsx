@@ -1,9 +1,10 @@
-import { Form, Button, ListGroup } from 'react-bootstrap';
+import { useState } from 'react';
+import { Form, Button, Collapse } from 'react-bootstrap';
 import { FaStar } from 'react-icons/fa'; // For rating stars
 
 function ProductFilterAndSortSidebar({
-    categories = [], // Ensure it has a default empty array
-    selectedCategory,
+    categories = [],
+    selectedCategories = [],
     onCategoryChange,
     selectedRating,
     onRatingChange,
@@ -33,32 +34,60 @@ function ProductFilterAndSortSidebar({
         ));
     };
 
+    const [showCategories, setShowCategories] = useState(false);
+
     return (
         <div className="sidebar p-3 border rounded shadow-sm">
             <h5 className="mb-3 text-primary">Filtros y Ordenamiento</h5>
 
-            {/* Category Filter */}
+            {/* Category Filter (Multi-select, Collapsible) */}
             <div className="mb-4">
-                <h6 className="mb-2">Categoría</h6>
-                <ListGroup>
-                    <ListGroup.Item
-                        action
-                        onClick={() => onCategoryChange('')}
-                        active={selectedCategory === ''}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <h6 className="mb-2" style={{ marginBottom: 0 }}>Categorías</h6>
+                    <Button
+                        variant="link"
+                        size="sm"
+                        aria-expanded={showCategories}
+                        onClick={() => setShowCategories((prev) => !prev)}
+                        style={{ textDecoration: 'none' }}
                     >
-                        Todas
-                    </ListGroup.Item>
-                    {categories.map((category) => (
-                        <ListGroup.Item
-                            key={category}
-                            action
-                            onClick={() => onCategoryChange(category)}
-                            active={selectedCategory === category}
-                        >
-                            {category}
-                        </ListGroup.Item>
-                    ))}
-                </ListGroup>
+                        {showCategories ? 'Ocultar' : 'Mostrar'}
+                    </Button>
+                </div>
+                <Collapse in={showCategories}>
+                    <div>
+                        <Form>
+                            <Form.Check
+                                type="checkbox"
+                                id="category-all"
+                                label="Todas"
+                                checked={selectedCategories.length === 0}
+                                onChange={() => onCategoryChange([])}
+                                className="mb-2"
+                            />
+                            {categories.map((category) => (
+                                <Form.Check
+                                    key={category}
+                                    type="checkbox"
+                                    id={`category-${category}`}
+                                    label={category}
+                                    checked={selectedCategories.includes(category)}
+                            onChange={() => {
+                                let newCats;
+                                if (selectedCategories.includes(category)) {
+                                    newCats = selectedCategories.filter((c) => c !== category);
+                                } else {
+                                    newCats = [...selectedCategories, category];
+                                }
+                                onCategoryChange(newCats);
+                                setShowCategories(false); // Oculta la lista tras seleccionar/deseleccionar
+                            }}
+                                    className="mb-1"
+                                />
+                            ))}
+                        </Form>
+                    </div>
+                </Collapse>
             </div>
 
             {/* Rating Filter */}

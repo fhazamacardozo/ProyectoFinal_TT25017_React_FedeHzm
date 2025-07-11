@@ -23,7 +23,7 @@ function Catalogue() {
     // --- State ---
     const [searchTerm, setSearchTerm] = useState('');
     const [appliedSearchTerm, setAppliedSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedRating, setSelectedRating] = useState(0);
     const [sortOption, setSortOption] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +44,7 @@ function Catalogue() {
         filteredProducts
     } = useProductManagement(
         appliedSearchTerm,
-        selectedCategory,
+        selectedCategories,
         selectedRating,
         sortOption,
         currentPage,
@@ -71,13 +71,13 @@ function Catalogue() {
     const handleOpenModal = (item) => { setSelectedItem(item); setIsModalOpen(true); };
     const handleCloseModal = () => { setIsModalOpen(false); setSelectedItem(null); };
     const handleSearchSubmit = () => { setAppliedSearchTerm(searchTerm); setCurrentPage(1); };
-    const handleCategoryChange = (cat) => { setSelectedCategory(cat); setCurrentPage(1); };
+    const handleCategoryChange = (cats) => { setSelectedCategories(cats); setCurrentPage(1); };
     const handleRatingChange = (rating) => { setSelectedRating(rating); setCurrentPage(1); };
     const handleSortChange = (sort) => { setSortOption(sort); setCurrentPage(1); };
     const handleClearFilters = () => {
         setSearchTerm('');
         setAppliedSearchTerm('');
-        setSelectedCategory('');
+        setSelectedCategories([]);
         setSelectedRating(0);
         setSortOption('');
         setCurrentPage(1);
@@ -135,7 +135,7 @@ function Catalogue() {
                     {/* Sidebar for Filters and Sort */}
                     <ProductFilterAndSortSidebar
                         categories={categories}
-                        selectedCategory={selectedCategory}
+                        selectedCategories={selectedCategories}
                         onCategoryChange={handleCategoryChange}
                         selectedRating={selectedRating}
                         onRatingChange={handleRatingChange}
@@ -221,7 +221,7 @@ function Catalogue() {
                 show={showOffcanvas}
                 onHide={handleOffcanvasClose}
                 categories={categories}
-                selectedCategory={selectedCategory}
+                selectedCategories={selectedCategories}
                 onCategoryChange={handleCategoryChange}
                 selectedRatingExclusive={selectedRating}
                 onRatingChangeExclusive={handleRatingChange}

@@ -54,27 +54,27 @@ function Register() {
             <Form onSubmit={handleSubmit} className="w-50 mx-auto">
                 <Form.Group controlId="formBasicUsername" className="mb-3">
                     <Form.Label>Nombre de usuario</Form.Label>
-                    <Form.Control type="text" placeholder="Enter username" name="username" required />
+                    <Form.Control type="text" placeholder="Ingresar nombre de usuario" name="username" required />
                 </Form.Group>
                 
                 <Form.Group controlId="formBasicFirstName" className="mb-3">
                     <Form.Label>Nombre</Form.Label>
-                    <Form.Control type="text" placeholder="Enter first name" name="firstName" required />
+                    <Form.Control type="text" placeholder="Ingresar nombre" name="firstName" required />
                 </Form.Group>
 
                 <Form.Group controlId="formBasicLastName" className="mb-3">
                     <Form.Label>Apellido</Form.Label>
-                    <Form.Control type="text" placeholder="Enter last name" name="lastName" required />
+                    <Form.Control type="text" placeholder="Ingresar apellido" name="lastName" required />
                 </Form.Group>
 
                 <Form.Group controlId="formBasicEmail" className="mb-3">
                     <Form.Label>Email</Form.Label>
-                    <Form.Control type="email" placeholder="Enter email" name="email" required />
+                    <Form.Control type="email" placeholder="Ingresar email" name="email" required />
                 </Form.Group>
 
                 <Form.Group controlId="formBasicPassword">
                     <Form.Label>Contraseña</Form.Label>
-                    <Form.Control type="password" placeholder="Password" name="password" required />
+                    <Form.Control type="password" placeholder="Contraseña" name="password" required />
                 </Form.Group>
                 <Button className="mt-3" variant="primary" type="submit" disabled={isLoading}>
                     {isLoading ? (

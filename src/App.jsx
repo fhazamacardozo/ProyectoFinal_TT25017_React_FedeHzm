@@ -20,7 +20,7 @@ function App() {
       <div className='d-flex flex-column min-vh-100'>
         <Header/>
         <NavBar />
-        <main className="flex-grow-1">
+        <main className="flex-grow-1 d-flex justify-content-center align-items-center">
           {loading ? (
                     <div className="text-center my-5">
                         <Spinner animation="border" role="status" variant="primary">

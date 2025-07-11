@@ -1,5 +1,5 @@
-import { useContext, useState, useMemo } from "react";
-import { Container, Row, Col, Button, Offcanvas } from "react-bootstrap";
+import { useContext, useState, useMemo, useEffect } from "react";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import CardList from "../Components/product/CardList";
 import { CartContext } from "../Context/CartContext";
 import { useAuth } from "../Context/AuthContext"; 
@@ -49,6 +49,13 @@ function Catalogue() {
     const [mobileLoadedCount, setMobileLoadedCount] = useState(pageSize);
     useInfiniteScroll({ isMobile, mobileLoadedCount, setMobileLoadedCount, filteredProducts, pageSize });
     const [showOffcanvas, setShowOffcanvas] = useState(false);
+
+    // Scroll to top on page change (desktop only)
+    useEffect(() => {
+        if (!isMobile) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [currentPage, isMobile]);
 
     const { isAuthenticated } = useAuth();
     const { addToCart } = useContext(CartContext);

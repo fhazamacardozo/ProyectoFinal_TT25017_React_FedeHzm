@@ -6,6 +6,7 @@ import { useAuth } from "../Context/AuthContext";
 import { useProductManagement } from "../Hooks/useProductManagement";
 import { useHandleAddToCart } from "../Hooks/useHandleAddToCart";
 import { useIsMobile, useInfiniteScroll } from "../Hooks/useMobileAndInfiniteScroll";
+import { useShowScrollToTopButton } from "../Hooks/useShowScrollToTopButton";
 import ProductDetailModal from "../Components/product/ProductDetailModal";
 import ProductFilterAndSortSidebar from "../Components/product/ProductFilterAndSortSidebar";
 import SearchBar from "../Components/common/SearchBar";
@@ -18,20 +19,22 @@ import { Title, Meta } from 'react-head';
 
 
 function Catalogue() {
-    // States for search, filter, and sort
+
+    // --- State ---
     const [searchTerm, setSearchTerm] = useState('');
     const [appliedSearchTerm, setAppliedSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedRating, setSelectedRating] = useState(0); // 0 means no minimum rating
-    const [sortOption, setSortOption] = useState(''); // e.g., 'name_asc', 'price_desc'
-
-    // Pagination states
+    const [selectedRating, setSelectedRating] = useState(0);
+    const [sortOption, setSortOption] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 12; // You can adjust this value
+    const [mobileLoadedCount, setMobileLoadedCount] = useState(12);
+    const [showOffcanvas, setShowOffcanvas] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const pageSize = 12;
 
-    // Mobile detection
+    // --- Hooks ---
     const isMobile = useIsMobile();
-    // Destructure properties from your custom hook, passing in filter/sort parameters
     const {
         products,
         categories,
@@ -47,71 +50,30 @@ function Catalogue() {
         currentPage,
         pageSize
     );
-    // Infinite scroll states (for mobile)
-    const [mobileLoadedCount, setMobileLoadedCount] = useState(pageSize);
     useInfiniteScroll({ isMobile, mobileLoadedCount, setMobileLoadedCount, filteredProducts, pageSize });
-    const [showOffcanvas, setShowOffcanvas] = useState(false);
+    const { isAuthenticated } = useAuth();
+    const { addToCart } = useContext(CartContext);
+    const handleAddToCart = useHandleAddToCart(addToCart, isAuthenticated);
 
-    // Estado para mostrar el botón flotante en mobile
-    const [showScrollTop, setShowScrollTop] = useState(false);
-    useEffect(() => {
-        if (!isMobile) return;
-        const handleScroll = () => {
-            setShowScrollTop(window.scrollY > 300);
-        };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [isMobile]);
+    // --- Effects ---
+    // Show scroll to top button based on mobile state
+    const showScrollToTopButton = useShowScrollToTopButton(isMobile);
 
-    const handleScrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    // Scroll to top on page change (desktop only)
+    // Scroll to top on page change for desktop
     useEffect(() => {
         if (!isMobile) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }, [currentPage, isMobile]);
 
-    const { isAuthenticated } = useAuth();
-    const { addToCart } = useContext(CartContext);
-
-    // Handler for Add to Cart button using shared hook (must be before any early return)
-    const handleAddToCart = useHandleAddToCart(addToCart, isAuthenticated);
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
-
-    const handleOpenModal = (item) => {
-        setSelectedItem(item);
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setSelectedItem(null);
-    };
-
-    const handleSearchSubmit = () => {
-        setAppliedSearchTerm(searchTerm);
-        setCurrentPage(1);
-    };
-
-    // Cambiar filtros resetea la página
-    const handleCategoryChange = (cat) => {
-        setSelectedCategory(cat);
-        setCurrentPage(1);
-    };
-    const handleRatingChange = (rating) => {
-        setSelectedRating(rating);
-        setCurrentPage(1);
-    };
-    const handleSortChange = (sort) => {
-        setSortOption(sort);
-        setCurrentPage(1);
-    };
-
+    // --- Handlers ---
+    const handleScrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+    const handleOpenModal = (item) => { setSelectedItem(item); setIsModalOpen(true); };
+    const handleCloseModal = () => { setIsModalOpen(false); setSelectedItem(null); };
+    const handleSearchSubmit = () => { setAppliedSearchTerm(searchTerm); setCurrentPage(1); };
+    const handleCategoryChange = (cat) => { setSelectedCategory(cat); setCurrentPage(1); };
+    const handleRatingChange = (rating) => { setSelectedRating(rating); setCurrentPage(1); };
+    const handleSortChange = (sort) => { setSortOption(sort); setCurrentPage(1); };
     const handleClearFilters = () => {
         setSearchTerm('');
         setAppliedSearchTerm('');
@@ -121,8 +83,6 @@ function Catalogue() {
         setCurrentPage(1);
         setShowOffcanvas(false);
     };
-
-    // Handlers for Offcanvas
     const handleOffcanvasClose = () => setShowOffcanvas(false);
     const handleOffcanvasShow = () => setShowOffcanvas(true);
 
@@ -271,7 +231,7 @@ function Catalogue() {
             />
 
             {/* Botón flotante para volver arriba en mobile */}
-            <ScrollToTopButton show={isMobile && showScrollTop} onClick={handleScrollToTop} />
+            <ScrollToTopButton show={isMobile && showScrollToTopButton} onClick={handleScrollToTop} />
 
 
            {/* Product Detail Modal */}

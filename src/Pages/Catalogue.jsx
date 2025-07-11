@@ -1,16 +1,18 @@
-import { useState, useContext, } from "react";
+import { useContext, useState, useMemo } from "react";
 import { Container, Row, Col, Button, Offcanvas } from "react-bootstrap";
 import CardList from "../Components/product/CardList";
 import { CartContext } from "../Context/CartContext";
 import { useAuth } from "../Context/AuthContext"; 
 import { useProductManagement } from "../Hooks/useProductManagement";
 import { useHandleAddToCart } from "../Hooks/useHandleAddToCart";
+import { useIsMobile, useInfiniteScroll } from "../Hooks/useMobileAndInfiniteScroll";
 import ProductDetailModal from "../Components/product/ProductDetailModal";
 import ProductFilterAndSortSidebar from "../Components/product/ProductFilterAndSortSidebar";
 import SearchBar from "../Components/common/SearchBar";
 import { FaFilter } from "react-icons/fa";
 import MobileFilterOffcanvas from "../Components/product/MobileFilterOffcanvas";
 import { Title, Meta } from 'react-head'; 
+
 
 
 function Catalogue() {
@@ -21,16 +23,32 @@ function Catalogue() {
     const [selectedRating, setSelectedRating] = useState(0); // 0 means no minimum rating
     const [sortOption, setSortOption] = useState(''); // e.g., 'name_asc', 'price_desc'
 
-    // State for Offcanvas visibility
-    const [showOffcanvas, setShowOffcanvas] = useState(false);
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 12; // You can adjust this value
 
+    // Mobile detection
+    const isMobile = useIsMobile();
     // Destructure properties from your custom hook, passing in filter/sort parameters
-    const { products, categories, isLoading, error } = useProductManagement(
+    const {
+        products,
+        categories,
+        isLoading,
+        error,
+        totalPages,
+        filteredProducts
+    } = useProductManagement(
         appliedSearchTerm,
         selectedCategory,
         selectedRating,
-        sortOption
+        sortOption,
+        currentPage,
+        pageSize
     );
+    // Infinite scroll states (for mobile)
+    const [mobileLoadedCount, setMobileLoadedCount] = useState(pageSize);
+    useInfiniteScroll({ isMobile, mobileLoadedCount, setMobileLoadedCount, filteredProducts, pageSize });
+    const [showOffcanvas, setShowOffcanvas] = useState(false);
 
     const { isAuthenticated } = useAuth();
     const { addToCart } = useContext(CartContext);
@@ -40,7 +58,6 @@ function Catalogue() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
-
 
     const handleOpenModal = (item) => {
         setSelectedItem(item);
@@ -53,7 +70,22 @@ function Catalogue() {
     };
 
     const handleSearchSubmit = () => {
-        setAppliedSearchTerm(searchTerm); // Apply search only when button is clicked or Enter is pressed
+        setAppliedSearchTerm(searchTerm);
+        setCurrentPage(1);
+    };
+
+    // Cambiar filtros resetea la página
+    const handleCategoryChange = (cat) => {
+        setSelectedCategory(cat);
+        setCurrentPage(1);
+    };
+    const handleRatingChange = (rating) => {
+        setSelectedRating(rating);
+        setCurrentPage(1);
+    };
+    const handleSortChange = (sort) => {
+        setSortOption(sort);
+        setCurrentPage(1);
     };
 
     const handleClearFilters = () => {
@@ -62,12 +94,22 @@ function Catalogue() {
         setSelectedCategory('');
         setSelectedRating(0);
         setSortOption('');
+        setCurrentPage(1);
         setShowOffcanvas(false);
     };
 
     // Handlers for Offcanvas
     const handleOffcanvasClose = () => setShowOffcanvas(false);
     const handleOffcanvasShow = () => setShowOffcanvas(true);
+
+    // ...existing code...
+
+    // Products to show: paginated for desktop, infinite for mobile (memoized)
+    const productsToShow = useMemo(() => (
+        isMobile
+            ? filteredProducts.slice(0, mobileLoadedCount)
+            : products
+    ), [isMobile, filteredProducts, mobileLoadedCount, products]);
 
     if (isLoading) {
         return (
@@ -112,11 +154,11 @@ function Catalogue() {
                     <ProductFilterAndSortSidebar
                         categories={categories}
                         selectedCategory={selectedCategory}
-                        onCategoryChange={setSelectedCategory}
+                        onCategoryChange={handleCategoryChange}
                         selectedRating={selectedRating}
-                        onRatingChange={setSelectedRating}
+                        onRatingChange={handleRatingChange}
                         sortOption={sortOption}
-                        onSortChange={setSortOption}
+                        onSortChange={handleSortChange}
                         onClearFilters={handleClearFilters}
                     />
                 </Col>
@@ -139,15 +181,35 @@ function Catalogue() {
 
                     <section className="mb-5">
                         <h2 className="text-primary mb-4 text-center">Productos</h2>
-                        {products.length === 0 && (
+                        {filteredProducts.length === 0 && (
                             <p className="text-center text-muted">No se encontraron productos con los filtros aplicados.</p>
                         )}
                         <CardList
-                            items={products}
+                            items={productsToShow}
                             buttonText="Ver Detalles"
                             onShowDetails={handleOpenModal}
                             onAddToCart={handleAddToCart}
                         />
+                        {/* Desktop Pagination Controls */}
+                        {!isMobile && filteredProducts.length > 0 && totalPages > 1 && (
+                            <div className="d-flex justify-content-center mt-4">
+                                <nav>
+                                    <ul className="pagination">
+                                        <li className={`page-item${currentPage === 1 ? " disabled" : ""}`}>
+                                            <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>&laquo;</button>
+                                        </li>
+                                        {Array.from({ length: totalPages }, (_, i) => (
+                                            <li key={i + 1} className={`page-item${currentPage === i + 1 ? " active" : ""}`}>
+                                                <button className="page-link" onClick={() => setCurrentPage(i + 1)}>{i + 1}</button>
+                                            </li>
+                                        ))}
+                                        <li className={`page-item${currentPage === totalPages ? " disabled" : ""}`}>
+                                            <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>&raquo;</button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        )}
                     </section>
                 </Col>
             </Row>
@@ -158,11 +220,11 @@ function Catalogue() {
                 onHide={handleOffcanvasClose}
                 categories={categories}
                 selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
+                onCategoryChange={handleCategoryChange}
                 selectedRatingExclusive={selectedRating}
-                onRatingChangeExclusive={setSelectedRating}
+                onRatingChangeExclusive={handleRatingChange}
                 sortOption={sortOption}
-                onSortChange={setSortOption}
+                onSortChange={handleSortChange}
                 onClearFilters={handleClearFilters}
             />
 

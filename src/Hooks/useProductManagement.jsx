@@ -12,7 +12,14 @@ import {
 
 const MySwal = withReactContent(Swal); // Instancia de SweetAlert2
 
-export const useProductManagement = (searchTerm = '', selectedCategory = '', selectedRating = 0, sortOption = '') => {
+export const useProductManagement = (
+    searchTerm = '',
+    selectedCategory = '',
+    selectedRating = 0,
+    sortOption = '',
+    currentPage = 1,
+    pageSize = 12 // default page size
+) => {
     const [allProducts, setAllProducts] = useState([]); // Store all original products
     const [isSaving, setIsSaving] = useState(false); // Para spinner de guardado
     const [isLoading, setIsLoading] = useState(true); // Carga inicial de la tabla
@@ -47,8 +54,8 @@ export const useProductManagement = (searchTerm = '', selectedCategory = '', sel
     }, [fetchProducts]); // Se ejecuta al montar el componente o si fetchProducts cambia (que no debería)
 
      // --- Filtering and Sorting Logic ---
-    const products = useMemo(() => {
-        let filteredAndSortedProducts = [...allProducts]; // Start with a copy of all products
+    const productsData = useMemo(() => {
+        let filteredAndSortedProducts = [...allProducts];
 
         // 1. Search Filter
         if (searchTerm) {
@@ -96,8 +103,20 @@ export const useProductManagement = (searchTerm = '', selectedCategory = '', sel
             });
         }
 
-        return filteredAndSortedProducts;
-    }, [allProducts, searchTerm, selectedCategory, selectedRating, sortOption]);
+        // Pagination logic
+        const totalProducts = filteredAndSortedProducts.length;
+        const totalPages = Math.ceil(totalProducts / pageSize);
+        const startIdx = (currentPage - 1) * pageSize;
+        const endIdx = startIdx + pageSize;
+        const paginatedProducts = filteredAndSortedProducts.slice(startIdx, endIdx);
+
+        return {
+            paginatedProducts,
+            totalPages,
+            totalProducts,
+            filteredAndSortedProducts // for infinite scroll
+        };
+    }, [allProducts, searchTerm, selectedCategory, selectedRating, sortOption, currentPage, pageSize]);
 
     // Extract unique categories for the sidebar
     const categories = useMemo(() => {
@@ -222,9 +241,9 @@ export const useProductManagement = (searchTerm = '', selectedCategory = '', sel
     };
 
     return {
-        products, // This is now the filtered and sorted list
-        allProducts, // The original, unfiltered list 
-        categories, // Unique categories for filtering
+        products: productsData.paginatedProducts,
+        allProducts,
+        categories,
         isLoading,
         error,
         isSaving,
@@ -236,6 +255,9 @@ export const useProductManagement = (searchTerm = '', selectedCategory = '', sel
         updateProduct,
         deleteProduct,
         uploadProductsFromJson,
-        setJsonUploadFeedback
+        setJsonUploadFeedback,
+        totalPages: productsData.totalPages,
+        totalProducts: productsData.totalProducts,
+        filteredProducts: productsData.filteredAndSortedProducts // for infinite scroll
     };
 };

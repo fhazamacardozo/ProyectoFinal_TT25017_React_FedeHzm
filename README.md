@@ -8,9 +8,9 @@ Este proyecto es una aplicación web de demostración de un e-commerce, desarrol
 * **Carrito de Compras:** Agrega, elimina y gestiona productos en tu carrito.
 * **Gestión de Productos (ABM):** Funcionalidad CRUD (Crear, Leer, Actualizar, Eliminar) de productos para usuarios con rol de administrador.
 * **Autenticación de Usuarios:** Registro e inicio de sesión con Firebase Authentication (correo electrónico y contraseña).
-* **Base de Datos:** Almacenamiento de productos en Firebase Firestore.
+* **Base de Datos NoSQL:** Almacenamiento de productos en Firebase Firestore.
 * **Diseño Responsivo:** Interfaz adaptable a dispositivos móviles, tabletas y escritorio.
-* **SEO y Accesibilidad:** Gestión de meta tags con React Helmet (o React Head) y atributos ARIA para mejorar la accesibilidad.
+* **SEO y Accesibilidad:** Gestión de meta tags con React Head.
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -34,7 +34,7 @@ Para probar las funciones de **Administración de Productos (ABM)**, inicia sesi
 
 ## ⚙️ Configuración y Ejecución Local
 
-Sigue estos pasos para poner el proyecto en marcha en tu máquina.
+Sigue estos pasos para poner el proyecto en marcha localmente.
 
 ### Prerrequisitos
 
@@ -58,8 +58,8 @@ Asegúrate de tener instalado:
 Para conectar la aplicación a tu proyecto de Firebase:
 
 1.  **Crear un proyecto en Firebase o consultar por credenciales de mi proyecto de prueba:** Accede a la [Consola de Firebase](https://console.firebase.google.com/) y crea un nuevo proyecto si no tienes uno. 
-2.  **Crea el archivo `.env.local`:** En la raíz de tu proyecto, crea un archivo llamado `.env.local`.
-3.  **Añade tus credenciales de Firebase:** Pega la configuración de tu proyecto de Firebase dentro de `.env.local`. Puedes encontrarla en la Consola de Firebase (Configuración del proyecto > Tus apps > Selecciona tu app web > Configuración).
+2.  **Crea el archivo `.env`:** En la raíz de tu proyecto, crea un archivo llamado `.env`.
+3.  **Añade tus credenciales de Firebase:** Pega la configuración de tu proyecto de Firebase dentro de `.env`. Puedes encontrarla en la Consola de Firebase (Configuración del proyecto > Tus apps > Selecciona tu app web > Configuración).
 
     ```dotenv
     VITE_FIREBASE_API_KEY="Tu_ApiKey_De_Firebase"

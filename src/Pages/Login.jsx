@@ -8,6 +8,7 @@ import withReactContent from "sweetalert2-react-content";
 import { useAuth } from "../Context/AuthContext";
 import { useState } from "react"; 
 import { useNavigate } from "react-router-dom";
+import { Title, Meta } from 'react-head';
 
 function Login() {
     const {login} = useAuth();
@@ -38,6 +39,11 @@ function Login() {
 
     return (
         <Container className="py-4">
+            {/* Title and description */}
+            <Title>E-commerce Demo - Ingreso</Title>
+            <Meta name="description" content="Ingresa a tu cuenta para acceder a todas las funcionalidades de nuestro E-commerce Demo." />
+            <Meta name="keywords" content="login, ingreso, e-commerce, demo, react, tienda online" />
+            
             <h1 className="text-center">Ingresar</h1>
             <Form onSubmit={handleSubmit} className="w-50 mx-auto">
                 <Form.Group controlId="formBasicEmail" className="mb-3">

@@ -3,7 +3,7 @@ import { Container, Table, Button, Row, Col, Card } from "react-bootstrap";
 import { CartContext } from "../Context/CartContext";
 import { FaTrash, FaShoppingCart } from "react-icons/fa"; 
 import { Link } from 'react-router-dom';
-
+import { Title, Meta } from 'react-head';
 function Cart() {
     const { cartItems = [], removeFromCart, clearCart, calculateTotal } = useContext(CartContext);
 
@@ -11,6 +11,10 @@ function Cart() {
     if (cartItems.length === 0) {
         return (
             <Container className="py-5 text-center">
+                <Title>Tu Carrito de Compras - E-commerce Demo</Title>
+                <Meta name="description" content="Revisa los productos en tu carrito de compras y procede al pago." />
+                <Meta name="keywords" content="carrito, compras, online, checkout, pagar" />
+    
                 <h2 className="text-primary mb-4">Tu Carrito de Compras</h2>
                 <FaShoppingCart size={80} className="text-muted mb-3" />
                 <p className="lead text-muted">¡Tu carrito está vacío! Explora nuestro catálogo para llenarlo.</p>
@@ -24,6 +28,9 @@ function Cart() {
     // Si el carrito tiene productos
     return (
         <Container className="py-5">
+            <Title>Tu Carrito de Compras - E-commerce Demo</Title>
+            <Meta name="description" content="Revisa los productos en tu carrito de compras y procede al pago." />
+            <Meta name="keywords" content="carrito, compras, online, checkout, pagar" />
             <h1 className="text-primary mb-4 text-center">Tu Carrito de Compras</h1>
 
             {/* Vista de tabla para pantallas grandes (md y arriba) */}

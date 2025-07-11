@@ -3,10 +3,18 @@ import { Link } from 'react-router-dom';
 import { FaReact, FaBootstrap } from 'react-icons/fa';
 import { IoLogoJavascript, IoLogoFirebase } from 'react-icons/io5'; 
 import { MdSecurity } from 'react-icons/md'; 
-
+import {PiHeadCircuit} from 'react-icons/pi';
+import {Title, Meta} from 'react-head'; 
 function Home() {
     return (
         <Container className="my-5">
+            <Title>E-commerce Demo - Inicio</Title> {/* <-- Usar Title */}
+            <Meta name="description" content="Bienvenido al E-commerce Demo. Explora nuestro catálogo de productos, gestiona tu carrito y descubre funciones de administración." /> {/* <-- Usar Meta */}
+            <Meta name="keywords" content="e-commerce, demo, react, tienda online, catálogo, carrito de compras, administración" />
+            <Meta property="og:title" content="E-commerce Demo - Inicio" />
+            <Meta property="og:description" content="Explora nuestra tienda demo construida con React y Bootstrap." />
+            <Meta property="og:type" content="website" />
+
             {/* Título Principal y Descripción - Centrado y ancho limitado en grandes pantallas */}
             <Row className="justify-content-center mb-5">
                 <Col xs={12} md={10} lg={8} className="text-center">
@@ -36,39 +44,46 @@ function Home() {
                 </Col>
             </Row>
 
-            {/* Technologies Used */}
+           {/* Technologies Used */}
             <Row className="mb-5">
                 <Col xs={12}>
                     <Card className="shadow-sm">
                         <Card.Body>
                             <Card.Title as="h2" className="text-secondary mb-3">Tecnologías Utilizadas</Card.Title>
-                            <Row className="text-center d-flex align-items-stretch g-3">
-                                <Col xs={12} sm={6} md={3}>
+                            <Row className="text-center d-flex align-items-stretch g-3 row-cols-1 row-cols-sm-2 row-cols-md-5"> 
+                                <Col>
                                     <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
                                         <FaReact size={40} className="text-info mb-2" />
                                         <p className="fw-bold mb-0">React.js</p>
                                         <small className="text-muted">Librería de UI</small>
                                     </div>
                                 </Col>
-                                <Col xs={12} sm={6} md={3}>
+                                <Col>
                                     <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
                                         <IoLogoJavascript size={40} className="text-warning mb-2" />
                                         <p className="fw-bold mb-0">JavaScript ES6+</p>
                                         <small className="text-muted">Lenguaje de Programación</small>
                                     </div>
                                 </Col>
-                                <Col xs={12} sm={6} md={3}>
+                                <Col>
                                     <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
-                                        <FaBootstrap size={40} className="text-purple mb-2" /> {/* Asegúrate de definir text-purple en tu CSS si no es de Bootstrap */}
+                                        <FaBootstrap size={40} className="text-purple mb-2" /> 
                                         <p className="fw-bold mb-0">React-Bootstrap</p>
                                         <small className="text-muted">Framework de UI</small>
                                     </div>
                                 </Col>
-                                <Col xs={12} sm={6} md={3}>
+                                <Col>
                                     <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
-                                        <IoLogoFirebase size={40} className="text-orange mb-2" /> {/* Asegúrate de definir text-orange en tu CSS si no es de Bootstrap */}
+                                        <IoLogoFirebase size={40} className="text-orange mb-2" /> 
                                         <p className="fw-bold mb-0">Firebase/Firestore</p>
                                         <small className="text-muted">Backend as a Service</small>
+                                    </div>
+                                </Col>
+                                <Col>
+                                    <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
+                                        <PiHeadCircuit size={40} className="text-purple mb-2" /> 
+                                        <p className="fw-bold mb-0">React Head</p> 
+                                        <small className="text-muted">SEO y Meta Tags</small>
                                     </div>
                                 </Col>
                             </Row>
@@ -88,10 +103,10 @@ function Home() {
                                 para aplicar conocimientos sobre:
                             </Card.Text>
                             <ul>
-                                <li>Manejo de estados con Hooks (`useState`, `useEffect`, `useContext`).</li>
-                                <li>Creación de Hooks personalizados para lógica reutilizable (`useProductManagement`).</li>
+                                <li>Manejo de estados con Hooks (useState, useEffect, useContext).</li>
+                                <li>Creación de Hooks personalizados para lógica reutilizable (useProductManagement).</li>
                                 <li>Componentización y modularización de la interfaz de usuario.</li>
-                                <li>Enrutamiento con `react-router-dom`.</li>
+                                <li>Enrutamiento con react-router-dom.</li>
                                 <li>Integración con una base de datos NoSQL (Firestore) para persistencia de datos.</li>
                                 <li>Autenticación de usuarios y protección de rutas.</li>
                                 <li>Implementación de funciones de búsqueda, filtrado y ordenamiento dinámicas.</li>

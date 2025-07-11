@@ -9,6 +9,7 @@ import ProductFilterAndSortSidebar from "../Components/ProductFilterAndSortSideb
 import SearchBar from "../Components/SearchBar";
 import { FaFilter } from "react-icons/fa";
 import MobileFilterOffcanvas from "../Components/MobileFilterOffcanvas";
+import { Title, Meta } from 'react-head'; 
 
 function Catalogue() {
    // States for search, filter, and sort
@@ -89,7 +90,9 @@ function Catalogue() {
                 <h1 className="display-5 fw-bold">Catálogo de Productos</h1>
                 <p className="lead text-muted">Explora nuestros productos destacados.</p>
             </header>
-
+            <Title>Catálogo de Productos - E-commerce Demo</Title>
+            <Meta name="description" content="Explora todos los productos de nuestro catálogo. Filtra por categoría, precio y rating." />
+            <Meta name="keywords" content="productos, catálogo, comprar, online, electrónica, ropa, joyería" />
             <Row>
                 <Col md={3} className="d-none d-md-block">
                     {/* Sidebar for Filters and Sort */}

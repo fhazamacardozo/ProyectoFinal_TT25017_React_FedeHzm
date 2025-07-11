@@ -1,4 +1,4 @@
-import { BrowserRouter as Router,Route,Routes } from 'react-router-dom';
+import {Route,Routes } from 'react-router-dom';
 import Home from './Pages/Home';
 import Catalogue from './Pages/Catalogue';
 import Cart from './Pages/Cart';
@@ -8,15 +8,12 @@ import Header from './Components/Header';
 import NavBar from './Components/NavBar';
 import Footer from './Components/Footer';
 import { ProtectedRoute, AdminRoute } from './Components/ProtectedRoute';
-import { AuthProvider } from './Context/AuthContext';
 import Register from './Pages/Register';
 import ProductManager from './Pages/ProductManager';
 
 function App() {
 
-  return (
-    <Router basename="/ProyectoFinal_TT25017_React_FedeHzm/">
-      <AuthProvider>
+  return (   
       <div className='d-flex flex-column min-vh-100'>
         <Header/>
         <NavBar />
@@ -46,8 +43,6 @@ function App() {
         </main>
         <Footer />
       </div>
-      </AuthProvider>
-    </Router>
   )
 }
 

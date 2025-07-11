@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useAuth } from "../Context/AuthContext";
 import { useState } from "react";
+import { Title, Meta } from "react-head";
 
 function Register() {
     const { register } = useAuth();
@@ -45,6 +46,10 @@ function Register() {
 
     return (
         <Container className="py-4">
+            {/* Title and description */}
+            <Title>Registro - E-commerce Demo</Title>
+            <Meta name="description" content="Regístrate para acceder a todas las funcionalidades de nuestro E-commerce Demo." />
+            <Meta name="keywords" content="registro, e-commerce, demo, react, tienda online" />
             <h1 className="text-center">Registro</h1>
             <Form onSubmit={handleSubmit} className="w-50 mx-auto">
                 <Form.Group controlId="formBasicUsername" className="mb-3">

@@ -143,13 +143,6 @@ export function AuthProvider ({ children }) {
         logout,
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-700">
-                <p className="text-lg font-medium">Cargando autenticación...</p>
-            </div>
-        );
-    }
     return (
         <AuthContext.Provider value={value}>
             {children}

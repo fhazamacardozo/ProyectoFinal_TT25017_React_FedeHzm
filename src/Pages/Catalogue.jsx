@@ -11,7 +11,9 @@ import ProductFilterAndSortSidebar from "../Components/product/ProductFilterAndS
 import SearchBar from "../Components/common/SearchBar";
 import { FaFilter } from "react-icons/fa";
 import MobileFilterOffcanvas from "../Components/product/MobileFilterOffcanvas";
-import { Title, Meta } from 'react-head'; 
+
+import ScrollToTopButton from "../Components/common/ScrollToTopButton";
+import { Title, Meta } from 'react-head';
 
 
 
@@ -49,6 +51,21 @@ function Catalogue() {
     const [mobileLoadedCount, setMobileLoadedCount] = useState(pageSize);
     useInfiniteScroll({ isMobile, mobileLoadedCount, setMobileLoadedCount, filteredProducts, pageSize });
     const [showOffcanvas, setShowOffcanvas] = useState(false);
+
+    // Estado para mostrar el botón flotante en mobile
+    const [showScrollTop, setShowScrollTop] = useState(false);
+    useEffect(() => {
+        if (!isMobile) return;
+        const handleScroll = () => {
+            setShowScrollTop(window.scrollY > 300);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [isMobile]);
+
+    const handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
     // Scroll to top on page change (desktop only)
     useEffect(() => {
@@ -108,8 +125,6 @@ function Catalogue() {
     // Handlers for Offcanvas
     const handleOffcanvasClose = () => setShowOffcanvas(false);
     const handleOffcanvasShow = () => setShowOffcanvas(true);
-
-    // ...existing code...
 
     // Products to show: paginated for desktop, infinite for mobile (memoized)
     const productsToShow = useMemo(() => (
@@ -171,20 +186,39 @@ function Catalogue() {
                 </Col>
 
                 <Col xs={12} md={9}> {/* xs=12 ensures it takes full width on small screens */}
-                    {/* Filter Button for Mobile - Visible on small screens (md-down) */}
-                    <div className="d-md-none mb-3 text-center">
-                        <Button variant="outline-primary" onClick={handleOffcanvasShow}>
-                            <FaFilter className="me-2" />
-                            Mostrar Filtros
-                        </Button>
+                    {/* Sticky Filter Button and Search Bar for Mobile */}
+                    <div
+                        className="d-md-none"
+                        style={{
+                            position: 'sticky',
+                            top: 0,
+                            zIndex: 1020,
+                            background: '#f8f9fa',
+                            padding: '12px 0 8px 0',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                        }}
+                    >
+                        <div className="mb-2 text-center">
+                            <Button variant="outline-primary" onClick={handleOffcanvasShow}>
+                                <FaFilter className="me-2" />
+                                Mostrar Filtros
+                            </Button>
+                        </div>
+                        <SearchBar
+                            searchTerm={searchTerm}
+                            onSearchChange={setSearchTerm}
+                            onSearchSubmit={handleSearchSubmit}
+                        />
                     </div>
 
-                    {/* Search Bar */}
-                    <SearchBar
-                        searchTerm={searchTerm}
-                        onSearchChange={setSearchTerm}
-                        onSearchSubmit={handleSearchSubmit}
-                    />
+                    {/* Desktop Search Bar (not sticky) */}
+                    <div className="d-none d-md-block mb-3">
+                        <SearchBar
+                            searchTerm={searchTerm}
+                            onSearchChange={setSearchTerm}
+                            onSearchSubmit={handleSearchSubmit}
+                        />
+                    </div>
 
                     <section className="mb-5">
                         <h2 className="text-primary mb-4 text-center">Productos</h2>
@@ -221,6 +255,7 @@ function Catalogue() {
                 </Col>
             </Row>
             
+
             {/* Mobile Filter Offcanvas Component */}
             <MobileFilterOffcanvas
                 show={showOffcanvas}
@@ -234,6 +269,9 @@ function Catalogue() {
                 onSortChange={handleSortChange}
                 onClearFilters={handleClearFilters}
             />
+
+            {/* Botón flotante para volver arriba en mobile */}
+            <ScrollToTopButton show={isMobile && showScrollTop} onClick={handleScrollToTop} />
 
 
            {/* Product Detail Modal */}

@@ -1,5 +1,5 @@
 import { Container, Row, Col, Card } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaReact, FaBootstrap, FaAtom } from 'react-icons/fa';
 import { IoLogoJavascript, IoLogoFirebase } from 'react-icons/io5'; 
 import { MdSecurity } from 'react-icons/md'; 
@@ -7,7 +7,18 @@ import {PiHeadCircuit} from 'react-icons/pi';
 import { SiReactrouter } from "react-icons/si";
 import { TiTick } from "react-icons/ti";
 import {Title, Meta} from 'react-head'; 
+import { useAuth } from '../Context/AuthContext';
+import { useRequireAuthAction } from '../Hooks/useRequireAuthAction';
+
 function Home() {
+    // Hook para verificar si el usuario está autenticado
+    const { isAuthenticated } = useAuth();
+    
+    const navigate = useNavigate();
+    const requireAuthAction = useRequireAuthAction(isAuthenticated);
+    const handleGoToCart = () => {
+        requireAuthAction(() => navigate('/Cart'));
+    };
     return (
         <Container className="my-5">
             <Title>E-commerce Demo - Inicio</Title> {/* <-- Usar Title */}
@@ -177,15 +188,17 @@ function Home() {
                     </Link>
                 </Col>
                 <Col xs={12} sm={6} md={4} className="text-center">
-                    <Link to="/Cart" className="btn btn-info btn-lg w-75">
+                    <button className="btn btn-info btn-lg w-75" onClick={handleGoToCart}>
                         Ir al Carrito
-                    </Link>
+                    </button>
                 </Col>
+                { !isAuthenticated && (
                 <Col xs={12} sm={6} md={4} className="text-center">
                     <Link to="/Login" className="btn btn-success btn-lg w-75">
                         Iniciar Sesión / Registrarse
                     </Link>
                 </Col>
+                )}
             </Row>
         </Container>
     );

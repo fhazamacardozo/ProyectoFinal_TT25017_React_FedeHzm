@@ -6,14 +6,20 @@ import { Container, Form, Button, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useAuth } from "../Context/AuthContext";
-import { useState } from "react"; 
+import { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
 import { Title, Meta } from 'react-head';
 
 function Login() {
-    const {login} = useAuth();
+    const {login, isAuthenticated} = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/", { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleSubmit = async (e) => { 
         e.preventDefault();
@@ -78,8 +84,8 @@ function Login() {
                     <span>¿No tienes una cuenta? </span>
                     <Button variant="link" onClick={()=>{navigate('/register');}}>Regístrate aquí</Button>
                 </div>
-        </Form>
-            </Container>
+            </Form>
+        </Container>
     );
 }
 export default Login;

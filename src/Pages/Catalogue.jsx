@@ -71,12 +71,20 @@ function Catalogue() {
 
     if (isLoading) {
         return (
-            <Container fluid className="py-4 bg-light text-center">
-                <div className="spinner-border text-primary" role="status">
+            <div style={{
+                minHeight: '60vh',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                background: '#fff',
+                width: '100%'
+            }}>
+                <div className="spinner-border text-primary" role="status" style={{ width: '4rem', height: '4rem' }}>
                     <span className="visually-hidden">Cargando...</span>
                 </div>
-                <p className="mt-2">Cargando productos...</p>
-            </Container>
+                <p className="mt-3 fs-5 text-secondary">Cargando productos...</p>
+            </div>
         );
     }
 

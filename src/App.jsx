@@ -14,47 +14,47 @@ import { Spinner } from 'react-bootstrap';
 import { useAuth } from './Context/AuthContext'; 
 
 function App() {
-  const { loading } = useAuth(); 
+    const { loading } = useAuth(); 
 
-  return (   
-      <div className='d-flex flex-column min-vh-100'>
-        <Header/>
-        <NavBar />
-        <main className="flex-grow-1 d-flex justify-content-center align-items-center">
-          {loading ? (
-                    <div className="text-center my-5">
-                        <Spinner animation="border" role="status" variant="primary">
-                            <span className="visually-hidden">Cargando autenticación...</span>
-                        </Spinner>
+    return (   
+        <div className='d-flex flex-column min-vh-100'>
+            <Header/>
+            <NavBar />
+            <main className="flex-grow-1 d-flex justify-content-center align-items-center">
+            {loading ? (
+                <div className="text-center my-5">
+                    <Spinner animation="border" role="status" variant="primary">
+                        <span className="visually-hidden">Cargando autenticación...</span>
+                    </Spinner>
                         <p className="mt-3 text-muted">Verificando sesión...</p>
-                    </div>
-                ) : (
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/Catalogue" element={<Catalogue/>} />
-                        <Route path="/Cart" element={
-                            <ProtectedRoute> 
-                                <Cart/>
-                            </ProtectedRoute>
-                            }
-                        />
-                        <Route path="/Login" element={<Login />} /> 
-                        <Route path="/Register" element={<Register />} /> 
-                        <Route path="/Admin/:name" element={
-                            <AdminRoute> 
-                                <Admin/>
-                            </AdminRoute>
-                        }/>
-                        <Route path="/ProductManager" element={
-                            <AdminRoute>
-                                <ProductManager/>
-                            </AdminRoute>
-                        }/> 
-                    </Routes>
-                )}
-            </main>
-            <Footer />
-        </div>
+                </div>
+            ) : (
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/Catalogue" element={<Catalogue/>} />
+                    <Route path="/Cart" element={
+                        <ProtectedRoute> 
+                            <Cart/>
+                        </ProtectedRoute>
+                        }
+                    />
+                    <Route path="/Login" element={<Login />} /> 
+                    <Route path="/Register" element={<Register />} /> 
+                    <Route path="/Admin/:name" element={
+                        <AdminRoute> 
+                            <Admin/>
+                        </AdminRoute>
+                    }/>
+                    <Route path="/ProductManager" element={
+                        <AdminRoute>
+                            <ProductManager/>
+                        </AdminRoute>
+                    }/> 
+                </Routes>
+            )}
+        </main>
+        <Footer />
+    </div>
     );
 }
 

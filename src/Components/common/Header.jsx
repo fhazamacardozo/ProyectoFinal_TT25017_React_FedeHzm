@@ -1,5 +1,5 @@
 import { Navbar, Container } from "react-bootstrap";
-import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 
 function Header() {
     const { isAuthenticated , user} = useAuth();

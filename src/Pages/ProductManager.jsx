@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Table, Spinner, Alert } from "react-bootstrap";
-import ProductFormModal from "../Components/ProductFormModal"; 
-import JsonUploadModal from "../Components/JsonUploadModal";
+import ProductFormModal from "../Components/product/ProductFormModal"; 
+import JsonUploadModal from "../Components/modals/JsonUploadModal";
 import { initialProductState } from "../Utils/InitialProductState"; 
 import { useProductManagement } from "../Hooks/useProductManagement";
 import {Title, Meta} from 'react-head'; // Importar para manejar el título y metadatos de la página

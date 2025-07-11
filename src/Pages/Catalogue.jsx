@@ -1,14 +1,14 @@
 import { useState, useContext, } from "react";
 import { Container, Row, Col, Button, Offcanvas } from "react-bootstrap";
-import CardList from "../Components/CardList";
+import CardList from "../Components/product/CardList";
 import { CartContext } from "../Context/CartContext";
 import { useAuth } from "../Context/AuthContext"; 
 import { useProductManagement } from "../Hooks/useProductManagement";
-import ProductDetailModal from "../Components/ProductDetailModal";
-import ProductFilterAndSortSidebar from "../Components/ProductFilterAndSortSidebar";
-import SearchBar from "../Components/SearchBar";
+import ProductDetailModal from "../Components/product/ProductDetailModal";
+import ProductFilterAndSortSidebar from "../Components/product/ProductFilterAndSortSidebar";
+import SearchBar from "../Components/common/SearchBar";
 import { FaFilter } from "react-icons/fa";
-import MobileFilterOffcanvas from "../Components/MobileFilterOffcanvas";
+import MobileFilterOffcanvas from "../Components/product/MobileFilterOffcanvas";
 import { Title, Meta } from 'react-head'; 
 
 function Catalogue() {

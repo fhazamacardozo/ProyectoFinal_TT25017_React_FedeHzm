@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../Context/AuthContext';
+import { useAuth } from '../../Context/AuthContext';
 
 // Componente genérico para rutas protegidas
 export const ProtectedRoute = ({ children }) => {

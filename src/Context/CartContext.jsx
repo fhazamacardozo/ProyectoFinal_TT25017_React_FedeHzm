@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
@@ -10,23 +11,26 @@ export function CartProvider({ children }) {
     const MySwal = withReactContent(Swal);
 
     const addToCart = (item) => {
-            const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
-            if (existingItem) {
+        const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
+        if (existingItem) {
             setCartItems(cartItems.map(cartItem =>
                 cartItem.id === item.id
-                ? { ...cartItem, quantity: cartItem.quantity + 1 }
-                : cartItem
+                    ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                    : cartItem
             ));
-            } 
-            else {
+        } else {
             setCartItems([...cartItems, { ...item, quantity: 1 }]);
-            }
-            MySwal.fire({
-                title: "Producto agregado al carrito",
-                text: `${item.title} ha sido agregado a tu carrito.`,
-                icon: "success",
-            });
-        };
+        }
+        toast.success(`${item.title} ha sido agregado a tu carrito.`, {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    };
 
     const removeFromCart = (itemId) => {
         MySwal.fire({

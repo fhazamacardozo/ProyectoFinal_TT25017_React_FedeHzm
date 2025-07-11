@@ -12,6 +12,8 @@ import Register from './Pages/Register';
 import ProductManager from './Pages/ProductManager';
 import { Spinner } from 'react-bootstrap'; 
 import { useAuth } from './Context/AuthContext'; 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
     const { loading } = useAuth(); 
@@ -54,6 +56,7 @@ function App() {
             )}
         </main>
         <Footer />
+        <ToastContainer />
     </div>
     );
 }

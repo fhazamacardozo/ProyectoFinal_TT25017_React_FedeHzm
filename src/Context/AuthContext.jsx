@@ -85,7 +85,7 @@ export function AuthProvider ({ children }) {
             if (userRole === "admin") {
                 navigate("/Admin/"+userDoc.data().username); // Navega al panel de admin
             } else {
-                navigate("/");
+                navigate("/Catalogue");
             }
             return true; // Login exitoso
         } 

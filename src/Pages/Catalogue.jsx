@@ -89,9 +89,6 @@ function Catalogue() {
         );
     }
 
-
-
-
     return (
         <Container fluid className="py-4 bg-light">
             <header className="text-center mb-4">

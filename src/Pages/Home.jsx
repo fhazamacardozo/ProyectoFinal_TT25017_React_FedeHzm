@@ -1,9 +1,11 @@
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaReact, FaBootstrap } from 'react-icons/fa';
+import { FaReact, FaBootstrap, FaAtom } from 'react-icons/fa';
 import { IoLogoJavascript, IoLogoFirebase } from 'react-icons/io5'; 
 import { MdSecurity } from 'react-icons/md'; 
 import {PiHeadCircuit} from 'react-icons/pi';
+import { SiReactrouter } from "react-icons/si";
+import { TiTick } from "react-icons/ti";
 import {Title, Meta} from 'react-head'; 
 function Home() {
     return (
@@ -50,7 +52,7 @@ function Home() {
                     <Card className="shadow-sm">
                         <Card.Body>
                             <Card.Title as="h2" className="text-secondary mb-3">Tecnologías Utilizadas</Card.Title>
-                            <Row className="text-center d-flex align-items-stretch g-3 row-cols-1 row-cols-sm-2 row-cols-md-5"> 
+                            <Row className="text-center d-flex align-items-stretch g-3 row-cols-1 row-cols-sm-2 row-cols-md-4"> 
                                 <Col>
                                     <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
                                         <FaReact size={40} className="text-info mb-2" />
@@ -67,7 +69,7 @@ function Home() {
                                 </Col>
                                 <Col>
                                     <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
-                                        <FaBootstrap size={40} className="text-purple mb-2" /> 
+                                        <FaBootstrap size={40} className="text-primary mb-2" /> 
                                         <p className="fw-bold mb-0">React-Bootstrap</p>
                                         <small className="text-muted">Framework de UI</small>
                                     </div>
@@ -84,6 +86,27 @@ function Home() {
                                         <PiHeadCircuit size={40} className="text-purple mb-2" /> 
                                         <p className="fw-bold mb-0">React Head</p> 
                                         <small className="text-muted">SEO y Meta Tags</small>
+                                    </div>
+                                </Col>
+                                <Col>
+                                    <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
+                                        <FaAtom size={40} style={{ color: '#e61e64' }} className=" mb-2" />
+                                        <p className="fw-bold mb-0">React Icons</p>
+                                        <small className="text-muted">Iconos SVG</small>
+                                    </div>
+                                </Col>
+                                <Col>
+                                    <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
+                                        <SiReactrouter size={40} className="text-danger mb-2" />
+                                        <p className="fw-bold mb-0">React Router</p>
+                                        <small className="text-muted">Enrutamiento</small>
+                                    </div>
+                                </Col>
+                                <Col>
+                                    <div className="p-3 border rounded h-100 d-flex flex-column justify-content-center align-items-center flex-grow-1">
+                                        <TiTick size={40} className="text-success mb-2" />
+                                        <p className="fw-bold mb-0">SweetAlert2</p>
+                                        <small className="text-muted">Alertas y Notificaciones</small>
                                     </div>
                                 </Col>
                             </Row>

@@ -9,7 +9,7 @@ import {
 } from "firebase/auth";
 import { auth, db } from "../FireBaseConfig";
 // Importa la instancia de auth y db
-import { doc, getDoc, setDoc } from "firebase/firestore"; // Para Firestore si guardas roles/info de usuario
+import { doc, getDoc, setDoc } from "firebase/firestore"; 
 
 const AuthContext = createContext();
 
@@ -29,7 +29,7 @@ export function AuthProvider ({ children }) {
             setIsAuthenticated(true);
             setUser(firebaseUser); // Guarda el objeto de usuario de Firebase
 
-            // Opcional: Obtener información adicional del usuario de Firestore (ej. rol)
+            // Opcional: Obtener información adicional del usuario de Firestore 
             try {
             const userDocRef = doc(db, "users", firebaseUser.uid);
             const userDoc = await getDoc(userDocRef);
@@ -48,7 +48,7 @@ export function AuthProvider ({ children }) {
             }
             } catch (error) {
             console.error("Error al obtener datos de usuario de Firestore:", error);
-            setIsAdmin(false); // Asume no admin si hay error
+            setIsAdmin(false); 
             }
 
         } else {

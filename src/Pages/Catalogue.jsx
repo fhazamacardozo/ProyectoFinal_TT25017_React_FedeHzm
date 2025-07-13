@@ -12,7 +12,6 @@ import ProductFilterAndSortSidebar from "../Components/product/ProductFilterAndS
 import SearchBar from "../Components/common/SearchBar";
 import { FaFilter } from "react-icons/fa";
 import MobileFilterOffcanvas from "../Components/product/MobileFilterOffcanvas";
-
 import ScrollToTopButton from "../Components/common/ScrollToTopButton";
 import { Title, Meta } from 'react-head';
 
@@ -223,8 +222,8 @@ function Catalogue() {
                 categories={categories}
                 selectedCategories={selectedCategories}
                 onCategoryChange={handleCategoryChange}
-                selectedRatingExclusive={selectedRating}
-                onRatingChangeExclusive={handleRatingChange}
+                selectedRating={selectedRating}
+                onRatingChange={handleRatingChange}
                 sortOption={sortOption}
                 onSortChange={handleSortChange}
                 onClearFilters={handleClearFilters}

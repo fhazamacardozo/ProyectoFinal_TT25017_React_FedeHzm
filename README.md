@@ -30,15 +30,15 @@ Para probar las funciones de **Administración de Productos (ABM)**, inicia sesi
 **Email:** `admin@admin.com`
 **Contraseña:** `adminadmin`
 
-*Puedes registrarte como un usuario normal para explorar la experiencia de compra sin acceso a la administración.*
+*Podes registrarte como un usuario normal para explorar la experiencia de compra sin acceso a la administración.*
 
 ## ⚙️ Configuración y Ejecución Local
 
-Sigue estos pasos para poner el proyecto en marcha localmente.
+Seguí estos pasos para poner el proyecto en marcha localmente.
 
 ### Prerrequisitos
 
-Asegúrate de tener instalado:
+Asegurate de tener instalado:
 * [Node.js](https://nodejs.org/en/download/) (versión 18+ recomendada)
 * [npm](https://www.npmjs.com/get-npm) o [Yarn](https://yarnpkg.com/getting-started/install)
 
@@ -55,11 +55,11 @@ Asegúrate de tener instalado:
 
 ### Variables de Entorno (Firebase API Key)
 
-Para conectar la aplicación a tu proyecto de Firebase:
+Para conectar la aplicación al proyecto de Firebase:
 
-1.  **Crear un proyecto en Firebase o consultar por credenciales de mi proyecto de prueba:** Accede a la [Consola de Firebase](https://console.firebase.google.com/) y crea un nuevo proyecto si no tienes uno. 
-2.  **Crea el archivo `.env`:** En la raíz de tu proyecto, crea un archivo llamado `.env`.
-3.  **Añade tus credenciales de Firebase:** Pega la configuración de tu proyecto de Firebase dentro de `.env`. Puedes encontrarla en la Consola de Firebase (Configuración del proyecto > Tus apps > Selecciona tu app web > Configuración).
+1.  **Crear un proyecto en Firebase o consultar por credenciales de mi proyecto de prueba:** Accede a la [Consola de Firebase](https://console.firebase.google.com/) y crea un nuevo proyecto si no tenés uno. 
+2.  **Crea el archivo `.env`:** En la raíz del proyecto, crea un archivo llamado `.env`.
+3.  **Añade tus credenciales de Firebase:** Pega la configuración del proyecto de Firebase dentro de `.env`. La encontras en la Consola de Firebase (Configuración del proyecto > Tus apps > Selecciona tu app web > Configuración).
 
     ```dotenv
     VITE_FIREBASE_API_KEY="Tu_ApiKey_De_Firebase"
@@ -78,6 +78,7 @@ npm run dev
 # o
 yarn dev
 La aplicación se abrirá en http://localhost:5173.
+```
 
 ##🙋‍♂️ Autor
 fhazamacardozo

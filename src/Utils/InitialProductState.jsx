@@ -1,4 +1,3 @@
-// src/utils/initialProductState.js
 export const initialProductState = {
     title: "",
     category: "",

@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function ScrollToTopButton({ show, onClick }) {
     if (!show) return null;
     return (

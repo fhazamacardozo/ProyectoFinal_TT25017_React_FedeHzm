@@ -10,7 +10,7 @@ import {
 } from '../Services/ProductService.jsx';
 
 
-const MySwal = withReactContent(Swal); // Instancia de SweetAlert2
+const MySwal = withReactContent(Swal); 
 
 export const useProductManagement = (
     searchTerm = '',
@@ -47,7 +47,7 @@ export const useProductManagement = (
         } finally {
             setIsLoading(false);
         }
-    }, []); // No tiene dependencias, solo se crea una vez
+    }, []); 
 
     useEffect(() => {
         fetchProducts();
@@ -126,7 +126,7 @@ export const useProductManagement = (
 
     // --- Lógica para añadir producto ---
     const addProduct = async (productData) => {
-        setIsSaving(true); // Puede ser un spinner global o de la operación
+        setIsSaving(true); 
         try {
             await addProductToDb(productData);
             await fetchProducts(); // Recargar la lista
@@ -153,10 +153,10 @@ export const useProductManagement = (
 
     // --- Lógica para actualizar producto ---
     const updateProduct = async (id, productData) => {
-        setIsSaving(true); // Puede ser un spinner global o de la operación
+        setIsSaving(true);
         try {
             await updateProductInDb(id, productData);
-            await fetchProducts(); // Recargar la lista
+            await fetchProducts();
             MySwal.fire({
                 title: "Éxito",
                 text: "Producto actualizado correctamente",
@@ -226,8 +226,8 @@ export const useProductManagement = (
                     type: 'success'
                 });
             }
-            await fetchProducts(); // Recargar la lista de productos en la tabla
-            return { uploadedCount, failedCount, errors }; // Devuelve los resultados para que el modal los use si quiere
+            await fetchProducts();
+            return { uploadedCount, failedCount, errors }; // Devuelve los resultados para que el modal los use 
         } catch (error) {
             console.error("Error al cargar productos desde JSON:", error);
             setJsonUploadFeedback({

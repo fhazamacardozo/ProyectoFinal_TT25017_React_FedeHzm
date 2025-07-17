@@ -15,11 +15,16 @@ import PropTypes from 'prop-types';
 /**
  * A reusable modal component for uploading a JSON file containing a list of products.
  *
- * @param {object} props - The component's props.
- * @param {boolean} props.show - Controls the visibility of the modal.
- * @param {function} props.onHide - Callback function to hide the modal.
- * @param {function(ProductData[]): Promise<void>} props.onProductsLoaded - Callback function called when products are successfully loaded and validated. It receives an array of products.
- * @param {string} [props.title='Cargar Productos desde JSON'] - The title of the modal.
+ * @param {object} props 
+ * - The component's props.
+ * @param {boolean} props.show 
+ * - Controls the visibility of the modal.
+ * @param {function} props.onHide 
+ * - Callback function to hide the modal.
+ * @param {function(ProductData[]): Promise<void>} props.onProductsLoaded 
+ * - Callback function called when products are successfully loaded and validated. It receives an array of products.
+ * @param {string} [props.title='Cargar Productos desde JSON'] 
+ * - The title of the modal.
  */
 function JsonUploadModal({ show, onHide, onProductsLoaded, title = 'Cargar Productos desde JSON' }) {
     const [file, setFile] = useState(null);
@@ -85,7 +90,7 @@ function JsonUploadModal({ show, onHide, onProductsLoaded, title = 'Cargar Produ
                     throw new Error('El archivo JSON no contiene productos.');
                 }
 
-                // --- More detailed product validation (optional but recommended) ---
+                // --- More detailed product validation  ---
                 const validatedProducts = products.map((product, index) => {
                     // Check for required fields and types
                     const requiredFields = ['title', 'category', 'description', 'price', 'image', 'rating'];
@@ -113,7 +118,7 @@ function JsonUploadModal({ show, onHide, onProductsLoaded, title = 'Cargar Produ
                 // Reset file input after successful load
                 setFile(null); 
                 // Don't hide the modal automatically, let the user close it.
-                // handleHide(); // You can choose to hide it here if you want.
+                // handleHide(); 
 
             } catch (err) {
                 console.error("Error processing JSON file:", err);

@@ -1,6 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-// Importa las funciones de autenticación de Firebase
 import { 
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
@@ -8,7 +7,6 @@ import {
     onAuthStateChanged 
 } from "firebase/auth";
 import { auth, db } from "../FireBaseConfig";
-// Importa la instancia de auth y db
 import { doc, getDoc, setDoc } from "firebase/firestore"; 
 
 const AuthContext = createContext();
@@ -29,19 +27,17 @@ export function AuthProvider ({ children }) {
             setIsAuthenticated(true);
             setUser(firebaseUser); // Guarda el objeto de usuario de Firebase
 
-            // Opcional: Obtener información adicional del usuario de Firestore 
+            // Obtener información adicional del usuario de Firestore 
             try {
             const userDocRef = doc(db, "users", firebaseUser.uid);
             const userDoc = await getDoc(userDocRef);
             if (userDoc.exists()) {
                 const userData = userDoc.data();
                 setIsAdmin(userData.role === "admin");
-                // Puedes extender el objeto user con estos datos si lo necesitas
                 setUser({ ...firebaseUser, ...userData }); 
             } else {
-                // Si el usuario no tiene un documento en Firestore (ej. recién registrado sin info extra)
+                // Si el usuario no tiene un documento en Firestore 
                 setIsAdmin(false); // Por defecto no es admin
-                // Opcional: Crear un documento base para el nuevo usuario aquí
                 await setDoc(userDocRef, { email: firebaseUser.email, role: 'user' });
                 setIsAdmin(false);
                 setUser({ ...firebaseUser, role: 'user' });
@@ -66,7 +62,7 @@ export function AuthProvider ({ children }) {
 
 
     // Función de Login con Firebase Authentication
-    const login = async (email, password) => { // Firebase usa email, no username
+    const login = async (email, password) => { 
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const firebaseUser = userCredential.user;
@@ -91,19 +87,18 @@ export function AuthProvider ({ children }) {
         } 
         catch (error) {
             console.error("Error de inicio de sesión con Firebase:", error.code, error.message);
-            // Puedes mapear los códigos de error de Firebase a mensajes más amigables
             return false; // Login fallido
         }
     };
 
-    // Función de Registro (opcional, pero útil para agregar nuevos usuarios)
+    // Función de Registro 
     const register = async (email, password, userName, firstName, lastName) => {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const firebaseUser = userCredential.user;
             console.log("Usuario registrado:", firebaseUser);
 
-            // Opcional: Guardar información adicional del usuario en Firestore (ej. rol por defecto)
+            // Guardar información adicional del usuario en Firestore 
             await setDoc(doc(db, "users", firebaseUser.uid), {
                 username: userName,
                 firstName: firstName,

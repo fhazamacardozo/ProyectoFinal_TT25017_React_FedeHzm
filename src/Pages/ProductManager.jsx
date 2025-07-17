@@ -4,7 +4,7 @@ import ProductFormModal from "../Components/product/ProductFormModal";
 import JsonUploadModal from "../Components/modals/JsonUploadModal";
 import { initialProductState } from "../Utils/InitialProductState"; 
 import { useProductManagement } from "../Hooks/useProductManagement";
-import {Title, Meta} from 'react-head'; // Importar para manejar el título y metadatos de la página
+import {Title, Meta} from 'react-head'; 
 
 function ProductManager() {
     const {
@@ -61,7 +61,7 @@ function ProductManager() {
     };
     const handleCloseJsonUploadModal = () => setShowJsonUploadModal(false);
 
-    // --- Funciones CRUD (ahora llaman al servicio) ---
+    // --- Funciones CRUD (llaman al servicio) ---
     const handleAddSubmit = async (productData) => {
         const success = await addProduct(productData);
         if (success) {
@@ -81,7 +81,6 @@ function ProductManager() {
     }
 
     const handleJsonUploadSubmit = async (loadedProducts) => {
-        // No manejamos el feedback de SweetAlerts aquí, lo hace el hook
         const result = await uploadProductsFromJson(loadedProducts);
         // Si todo fue exitoso, cerramos el modal. Si no, el feedback queda visible.
         if (result.failedCount === 0) {
@@ -161,7 +160,7 @@ function ProductManager() {
                 </tr>
                 </thead>
                 <tbody>
-                {isLoading ? ( // Use isLoading from the hook
+                {isLoading ? ( 
                         <tr>
                             <td colSpan="7" className="text-center">
                                 <Spinner animation="border" role="status" className="me-2" />
@@ -218,7 +217,7 @@ function ProductManager() {
                                     size="sm"
                                     role="status"
                                     aria-hidden="true"
-                                    className="me-1" // Espacio entre spinner y texto
+                                    className="me-1" 
                                     />
                                     Eliminando...
                                 </>

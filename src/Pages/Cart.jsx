@@ -118,7 +118,6 @@ function Cart() {
                         <h4 className="mb-0">
                             Total: <strong className="text-success">${calculateTotal(cartItems).toFixed(2)}</strong>
                         </h4>
-                        {/* Puedes añadir un botón de "Proceder al Pago" aquí */}
                         <Button variant="success" className="mt-3">
                             Proceder al Pago
                         </Button>

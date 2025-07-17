@@ -21,7 +21,7 @@ function Home() {
     };
     return (
         <Container className="my-5">
-            <Title>E-commerce Demo - Inicio</Title> {/* <-- Usar Title */}
+            <Title>E-commerce Demo - Inicio</Title> 
             <Meta name="description" content="Bienvenido al E-commerce Demo. Explora nuestro catálogo de productos, gestiona tu carrito y descubre funciones de administración." /> {/* <-- Usar Meta */}
             <Meta name="keywords" content="e-commerce, demo, react, tienda online, catálogo, carrito de compras, administración" />
             <Meta property="og:title" content="E-commerce Demo - Inicio" />

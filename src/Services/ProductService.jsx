@@ -1,5 +1,4 @@
-// src/Services/ProductService.jsx
-import { db } from "../FireBaseConfig"; // Asegúrate que esta ruta sea correcta
+import { db } from "../FireBaseConfig"; 
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 
 const productsCollectionRef = collection(db, "products");

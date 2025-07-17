@@ -1,7 +1,3 @@
-//Login Component
-// This component is used to display the login page.
-// It contains a form with username and password fields.
-// It uses local storage to store the authentication status.
 import { Container, Form, Button, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -71,7 +67,7 @@ function Login() {
                             size="sm"
                             role="status"
                             aria-hidden="true"
-                            className="me-2" // Margen a la derecha del spinner
+                            className="me-2" 
                         />
                         Cargando...
                         </>

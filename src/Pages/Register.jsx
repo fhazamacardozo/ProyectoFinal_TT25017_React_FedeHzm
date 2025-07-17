@@ -1,5 +1,3 @@
-//Register.jsx simple form to register a new user with username,first name, last name, email and password 
-// using React, Bootstrap, and SweetAlert2 for notifications and my firebase register function.
 import { Container, Form, Button, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -85,7 +83,7 @@ function Register() {
                                 size="sm"
                                 role="status"
                                 aria-hidden="true"
-                                className="me-2" // Margen a la derecha del spinner
+                                className="me-2" 
                             />
                             Cargando...
                         </>

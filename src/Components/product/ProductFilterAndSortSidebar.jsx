@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Form, Button, Collapse } from 'react-bootstrap';
-import { FaStar } from 'react-icons/fa'; // For rating stars
+import { FaStar } from 'react-icons/fa'; 
 
 function ProductFilterAndSortSidebar({
     categories = [],

@@ -3,7 +3,7 @@
     border: 1px solid black;
     border-radius: 10px;
     padding: 10px;
-    text-align: center; /* Esto aún puede ser útil para centrar texto dentro de la tarjeta */
+    text-align: center; 
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     transition: transform 0.2s ease;
 }

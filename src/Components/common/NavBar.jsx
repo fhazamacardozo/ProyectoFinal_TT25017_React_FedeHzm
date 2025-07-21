@@ -17,7 +17,7 @@ function NavBar() {
             <Container fluid>
                 <Navbar.Toggle aria-controls="main-navbar-nav" />
                 <Navbar.Collapse id="main-navbar-nav">
-                    <Nav className="me-auto align-items-center gap-2 flex-md-row flex-column">
+                    <Nav className="me-auto align-items gap-2 flex-md-row flex-column">
                         <Nav.Link as={Link} to="/" className={`fw-semibold d-flex align-items-center gap-1 ${isActive('/') ? 'bg-info text-dark rounded px-3 py-1' : 'text-white'}`}>
                             <FaHome size={18} /> Inicio
                         </Nav.Link>

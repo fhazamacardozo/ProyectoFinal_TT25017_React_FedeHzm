@@ -10,13 +10,13 @@ import {HeadProvider} from 'react-head';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <HeadProvider>
-        <CartProvider>
-          <Router basename="/ProyectoFinal_TT25017_React_FedeHzm/">
-            <AuthProvider>
-              <App />
-            </AuthProvider>
-          </Router>
-        </CartProvider>
+      <Router basename="/ProyectoFinal_TT25017_React_FedeHzm/">
+        <AuthProvider>
+          <CartProvider>
+            <App />
+          </CartProvider>
+        </AuthProvider>
+      </Router>
     </HeadProvider>
   </StrictMode>,
 )

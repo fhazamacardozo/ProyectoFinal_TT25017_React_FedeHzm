@@ -1,11 +1,33 @@
 import { useContext } from "react";
-import { Container, Table, Button, Row, Col, Card } from "react-bootstrap";
-import { CartContext } from "../Context/CartContext";
+import { Container, Table, Button, Row, Col, Card, Spinner } from "react-bootstrap";
+import { CartContext } from "../Context/CartContextDef";
 import { FaTrash, FaShoppingCart } from "react-icons/fa"; 
 import { Link } from 'react-router-dom';
 import { Title, Meta } from 'react-head';
 function Cart() {
-    const { cartItems = [], removeFromCart, clearCart, calculateTotal } = useContext(CartContext);
+    const { cartItems = [], removeFromCart, clearCart, calculateTotal, cartLoading } = useContext(CartContext);
+
+    // Spinner overlay for cart actions
+    if (cartLoading) {
+        return (
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                background: 'rgba(255,255,255,0.7)',
+                zIndex: 9999,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>
+                <Spinner animation="border" variant="primary" style={{ width: '4rem', height: '4rem' }} />
+                <p className="mt-3 fs-5 text-secondary">Procesando carrito...</p>
+            </div>
+        );
+    }
 
     // Si el carrito está vacío
     if (cartItems.length === 0) {

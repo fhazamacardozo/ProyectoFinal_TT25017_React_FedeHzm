@@ -1,9 +1,9 @@
-import { Card,Button } from 'react-bootstrap'; 
+import { Card, Button, Spinner } from 'react-bootstrap'; 
 import styles from './ProductCard.module.css';
 
 
 
-function ProductCard({ item, buttonText, onShowDetails, onAddToCart }) {
+function ProductCard({ item, buttonText, onShowDetails, onAddToCart, cartLoading }) {
     return (
         <Card className={`h-100 ${styles.customCard}`}>
             <Card.Img
@@ -26,8 +26,15 @@ function ProductCard({ item, buttonText, onShowDetails, onAddToCart }) {
                     </Button>
                 )}
                 {onAddToCart && (
-                    <Button variant="success" className="w-100" onClick={() => onAddToCart(item)}>
-                        Añadir al carrito
+                    <Button variant="success" className="w-100" onClick={() => onAddToCart(item)} disabled={cartLoading}>
+                        {cartLoading ? (
+                            <>
+                                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-2" />
+                                Procesando...
+                            </>
+                        ) : (
+                            "Añadir al carrito"
+                        )}
                     </Button>
                 )}
             </Card.Body>

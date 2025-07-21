@@ -1,7 +1,7 @@
 import { useContext, useState, useMemo, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import CardList from "../Components/product/CardList";
-import { CartContext } from "../Context/CartContext";
+import { CartContext } from "../Context/CartContextDef";
 import { useAuth } from "../Context/AuthContext"; 
 import { useProductManagement } from "../Hooks/useProductManagement";
 import { useHandleAddToCart } from "../Hooks/useHandleAddToCart";
@@ -51,7 +51,7 @@ function Catalogue() {
     );
     useInfiniteScroll({ isMobile, mobileLoadedCount, setMobileLoadedCount, filteredProducts, pageSize });
     const { isAuthenticated } = useAuth();
-    const { addToCart } = useContext(CartContext);
+    const { addToCart, cartLoading, addingToCartId } = useContext(CartContext);
     const handleAddToCart = useHandleAddToCart(addToCart, isAuthenticated);
 
     // --- Effects ---
@@ -189,6 +189,8 @@ function Catalogue() {
                             buttonText="Ver Detalles"
                             onShowDetails={handleOpenModal}
                             onAddToCart={handleAddToCart}
+                            cartLoading={cartLoading}
+                            addingToCartId={addingToCartId}
                         />
                         {/* Desktop Pagination Controls */}
                         {!isMobile && filteredProducts.length > 0 && totalPages > 1 && (

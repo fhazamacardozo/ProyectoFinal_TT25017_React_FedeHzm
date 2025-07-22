@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Button, Table, Spinner, Alert } from "react-bootstrap";
 import ProductFormModal from "../Components/product/ProductFormModal"; 
 import JsonUploadModal from "../Components/modals/JsonUploadModal";
 import { initialProductState } from "../Utils/InitialProductState"; 
 import { useProductManagement } from "../Hooks/useProductManagement";
+import { AuthContext } from "../Context/AuthContextDef";
 import {Title, Meta} from 'react-head'; 
 
 function ProductManager() {
     const {
-        products,
+        allProducts,
         isLoading,
         isSaving,
         isDeletingId,
@@ -20,6 +21,8 @@ function ProductManager() {
         uploadProductsFromJson,
         setJsonUploadFeedback // Para permitir limpiar el feedback del JSON desde aquí
     } = useProductManagement();
+
+    const { user } = useContext(AuthContext); // Obtener usuario actual
 
     const [newProduct, setNewProduct] = useState(initialProductState);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -63,7 +66,7 @@ function ProductManager() {
 
     // --- Funciones CRUD (llaman al servicio) ---
     const handleAddSubmit = async (productData) => {
-        const success = await addProduct(productData);
+        const success = await addProduct(productData, user);
         if (success) {
             handleCloseAddModal();
         }
@@ -81,7 +84,7 @@ function ProductManager() {
     }
 
     const handleJsonUploadSubmit = async (loadedProducts) => {
-        const result = await uploadProductsFromJson(loadedProducts);
+        const result = await uploadProductsFromJson(loadedProducts, user);
         // Si todo fue exitoso, cerramos el modal. Si no, el feedback queda visible.
         if (result.failedCount === 0) {
             handleCloseJsonUploadModal();
@@ -167,14 +170,14 @@ function ProductManager() {
                                 Cargando productos...
                             </td>
                         </tr>
-                    ) :products.length === 0 ? (
+                    ) :allProducts.length === 0 ? (
                     <tr>
                     <td colSpan="7" className="text-center">
                         No hay productos disponibles.
                     </td>
                     </tr>
                 ) : (
-                    products.map((product) => (
+                    allProducts.map((product) => (
                     <tr key={product.id}>
                         <td>{product.id}</td>
                         <td>{product.title}</td>

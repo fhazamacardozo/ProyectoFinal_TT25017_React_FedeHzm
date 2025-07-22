@@ -1,4 +1,5 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
+import { AuthContext } from "./AuthContextDef";
 import { useNavigate } from "react-router-dom";
 import { 
     createUserWithEmailAndPassword, 
@@ -7,9 +8,22 @@ import {
     onAuthStateChanged 
 } from "firebase/auth";
 import { auth, db } from "../FireBaseConfig";
-import { doc, getDoc, setDoc } from "firebase/firestore"; 
+import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "firebase/firestore"; 
+// Función para registrar actividad de usuarios nuevos
+async function logUserActivity(user) {
+    try {
+        await addDoc(collection(db, "activity_users"), {
+            userId: user.uid,
+            userName: user.displayName || user.username || "",
+            email: user.email,
+            timestamp: serverTimestamp(),
+            action: "register"
+        });
+    } catch (err) {
+        console.error("Error registrando actividad de usuario:", err);
+    }
+}
 
-const AuthContext = createContext();
 
 export function AuthProvider ({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -105,6 +119,14 @@ export function AuthProvider ({ children }) {
                 lastName: lastName,
                 email: firebaseUser.email,
                 role: "user", // Rol por defecto
+            });
+
+            // Registrar actividad de usuario nuevo
+            await logUserActivity({
+                uid: firebaseUser.uid,
+                displayName: firebaseUser.displayName,
+                username: userName,
+                email: firebaseUser.email
             });
 
             navigate("/"); // Navega a home después del registro

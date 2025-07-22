@@ -1,4 +1,23 @@
-import { useState, useEffect, useCallback,  useMemo } from 'react';
+// Función para registrar actividad de carga masiva de productos
+export async function logProductActivityMassive(products, user, failedProducts = []) {
+    try {
+        // Solo productos subidos con éxito
+        const productDetails = products.map(p => ({ id: p.id, title: p.title || p.name || '' }));
+        const failedDetails = failedProducts.map(fp => ({ title: fp.productTitle || fp.title || '' }));
+        await addDoc(collection(db, 'activity_products'), {
+            products: productDetails,
+            failedProducts: failedDetails,
+            userId: user?.uid || '',
+            userName: user?.displayName || user?.email || '',
+            timestamp: serverTimestamp(),
+            action: 'add-massive',
+            source: 'json'
+        });
+    } catch (err) {
+        console.error('Error registrando actividad masiva de productos:', err);
+    }
+}
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import {
@@ -6,8 +25,26 @@ import {
     addProductToDb,
     updateProductInDb,
     deleteProductFromDb,
-    addProductsFromJsonToDb, 
+    addProductsFromJsonToDb,
 } from '../Services/ProductService.jsx';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../FireBaseConfig';
+// Función para registrar actividad de productos agregados
+export async function logProductActivity(product, user, source = "manual") {
+    try {
+        await addDoc(collection(db, 'activity_products'), {
+            productId: product.id || null,
+            productName: product.title || product.name || '',
+            userId: user?.uid || '',
+            userName: user?.displayName || user?.email || '',
+            timestamp: serverTimestamp(),
+            action: 'add',
+            source
+        });
+    } catch (err) {
+        console.error('Error registrando actividad de producto:', err);
+    }
+}
 
 
 const MySwal = withReactContent(Swal); 
@@ -125,10 +162,14 @@ export const useProductManagement = (
     }, [allProducts]);
 
     // --- Lógica para añadir producto ---
-    const addProduct = async (productData) => {
-        setIsSaving(true); 
+    const addProduct = async (productData, user) => {
+        setIsSaving(true);
         try {
-            await addProductToDb(productData);
+            const addedProduct = await addProductToDb(productData);
+            // Registrar actividad en Firestore
+            if (user) {
+                await logProductActivity(addedProduct || productData, user, "manual");
+            }
             await fetchProducts(); // Recargar la lista
             MySwal.fire({
                 title: "Éxito",
@@ -207,12 +248,25 @@ export const useProductManagement = (
     };
 
     // --- Lógica para cargar productos desde JSON ---
-    const uploadProductsFromJson = async (loadedProducts) => {
+    const uploadProductsFromJson = async (loadedProducts, user) => {
         setIsUploadingJson(true);
         setJsonUploadFeedback({ message: '', type: '' });
 
         try {
-            const { uploadedCount, failedCount, errors } = await addProductsFromJsonToDb(loadedProducts);
+            const { uploadedCount, failedCount, errors, results } = await addProductsFromJsonToDb(loadedProducts);
+            // Filtrar solo los productos subidos con éxito
+            const uploadedProducts = results
+                .filter(r => r.status === 'success')
+                .map(r => r.product);
+            // Filtrar productos fallidos
+            const failedProducts = results
+                .filter(r => r.status === 'failed')
+                .map(r => ({ productTitle: r.productTitle }));
+
+            // Registrar actividad masiva en Firestore
+            if (user && (uploadedProducts.length > 0 || failedProducts.length > 0)) {
+                await logProductActivityMassive(uploadedProducts, user, failedProducts);
+            }
 
             if (failedCount > 0) {
                 setJsonUploadFeedback({
@@ -227,7 +281,7 @@ export const useProductManagement = (
                 });
             }
             await fetchProducts();
-            return { uploadedCount, failedCount, errors }; // Devuelve los resultados para que el modal los use 
+            return { uploadedCount, failedCount, errors };
         } catch (error) {
             console.error("Error al cargar productos desde JSON:", error);
             setJsonUploadFeedback({

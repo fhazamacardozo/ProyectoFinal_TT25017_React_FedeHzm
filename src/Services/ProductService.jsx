@@ -28,7 +28,8 @@ export const addProductToDb = async (productData) => {
         },
     };
     const docRef = await addDoc(productsCollectionRef, dataToSend);
-    return docRef.id;
+    // Return the product object with Firestore ID
+    return { ...productData, id: docRef.id };
 };
 
 /**
@@ -80,9 +81,10 @@ export const addProductsFromJsonToDb = async (productsArray) => {
                     rate: parseFloat(product.rating.rate),
                 },
             };
-            await addDoc(productsCollectionRef, dataToSend);
+            const docRef = await addDoc(productsCollectionRef, dataToSend);
             uploadedCount++;
-            return { status: 'success', productTitle: product.title };
+            // Push product object with Firestore ID
+            return { status: 'success', product: { ...product, id: docRef.id } };
         } catch (error) {
             failedCount++;
             const errorMessage = `Error subiendo producto "${product.title || `índice ${index}`}" a DB: ${error.message}`;

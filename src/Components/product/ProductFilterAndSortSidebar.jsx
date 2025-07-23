@@ -10,7 +10,10 @@ function ProductFilterAndSortSidebar({
     onRatingChange,
     sortOption,
     onSortChange,
-    onClearFilters
+    onClearFilters,
+    pageSize,
+    onPageSizeChange,
+    isMobile = false
 }) {
     const renderRatingOptions = () => {
         return [5, 4, 3, 2, 1].map((rating) => (
@@ -121,6 +124,20 @@ function ProductFilterAndSortSidebar({
                     <option value="rating_asc">Valoración (Menor a Mayor)</option>
                 </Form.Select>
             </div>
+
+
+            {/* Items per page selector (hide on mobile) */}
+            {!isMobile && (
+                <div className="mb-4">
+                    <h6 className="mb-2">Items por página</h6>
+                    <Form.Select value={pageSize} onChange={e => onPageSizeChange(Number(e.target.value))}>
+                        <option value={12}>12</option>
+                        <option value={24}>24</option>
+                        <option value={48}>48</option>
+                        <option value={96}>96</option>
+                    </Form.Select>
+                </div>
+            )}
 
             <Button variant="outline-danger" onClick={onClearFilters} className="w-100">
                 Limpiar Filtros

@@ -50,10 +50,10 @@ function ProductListPage({
     const [sortOption, setSortOption] = useState('name_asc');
     const [currentPage, setCurrentPage] = useState(1);
     const [mobileLoadedCount, setMobileLoadedCount] = useState(12);
+    const [pageSize, setPageSize] = useState(12);
     const [showOffcanvas, setShowOffcanvas] = useState(false);
     const isMobile = useIsMobile();
     const showScrollBtn = useShowScrollToTopButton(isMobile);
-    const pageSize = 12;
 
 
     // Filtering, then sorting
@@ -122,6 +122,14 @@ function ProductListPage({
         setSelectedRating(0);
         setSortOption('');
         setCurrentPage(1);
+        setPageSize(12);
+        resetMobileLoadedCount();
+    };
+
+    // Items per page selector handler
+    const handlePageSizeChange = (size) => {
+        setPageSize(size);
+        setCurrentPage(1);
         resetMobileLoadedCount();
     };
     const handleScrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
@@ -145,6 +153,8 @@ function ProductListPage({
             sortOption={sortOption}
             onSortChange={handleSortChange}
             onClearFilters={handleClearFilters}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
         />
     );
 
@@ -159,9 +169,13 @@ function ProductListPage({
     return (
         <div className="container mt-5">
             {/* Mobile offcanvas (default or custom) */}
-            {showMobileOffcanvas && (renderMobileOffcanvas ? renderMobileOffcanvas({showOffcanvas, setShowOffcanvas, categories}) : defaultMobileOffcanvas)}
+            {showMobileOffcanvas && (
+                renderMobileOffcanvas ? 
+                renderMobileOffcanvas({showOffcanvas, setShowOffcanvas, categories}) : defaultMobileOffcanvas)}
             {/* Scroll-to-top button (default or custom) */}
-            {showScrollToTop && (renderScrollToTopButton ? renderScrollToTopButton({show: showScrollBtn}) : defaultScrollToTopButton)}
+            {showScrollToTop && (
+                renderScrollToTopButton ? 
+                renderScrollToTopButton({show: showScrollBtn}) : defaultScrollToTopButton)}
             <h2>{title}</h2>
             <p className="text-muted mb-4">{description}</p>
             {extraHeader}
@@ -176,6 +190,8 @@ function ProductListPage({
                         sortOption={sortOption}
                         onSortChange={handleSortChange}
                         onClearFilters={handleClearFilters}
+                        pageSize={pageSize}
+                        onPageSizeChange={handlePageSizeChange}
                     />
                 </Col>
                 <Col xs={12} md={9}>

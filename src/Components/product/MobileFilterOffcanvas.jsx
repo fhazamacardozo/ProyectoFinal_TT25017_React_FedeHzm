@@ -11,7 +11,9 @@ function MobileFilterOffcanvas({
     onRatingChange,
     sortOption,
     onSortChange,
-    onClearFilters
+    onClearFilters,
+    pageSize,
+    onPageSizeChange
 }) {
     // Handlers para cerrar el offcanvas al cambiar cualquier filtro
     const handleCategoryChange = (cats) => {
@@ -46,6 +48,9 @@ function MobileFilterOffcanvas({
                     sortOption={sortOption}
                     onSortChange={handleSortChange}
                     onClearFilters={handleClearFilters}
+                    pageSize={pageSize}
+                    onPageSizeChange={onPageSizeChange}
+                    isMobile={true}
                 />
             </Offcanvas.Body>
         </Offcanvas>

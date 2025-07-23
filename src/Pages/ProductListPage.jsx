@@ -126,6 +126,12 @@ function ProductListPage({
     };
     const handleScrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
+    // Scroll to top when changing page (desktop)
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     // Default mobile offcanvas
     const defaultMobileOffcanvas = (
         <MobileFilterOffcanvas
@@ -210,15 +216,15 @@ function ProductListPage({
                                     <nav>
                                         <ul className="pagination">
                                             <li className={`page-item${currentPage === 1 ? " disabled" : ""}`}>
-                                                <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>&laquo;</button>
+                                                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
                                             </li>
                                             {Array.from({ length: totalPages }, (_, i) => (
                                                 <li key={i + 1} className={`page-item${currentPage === i + 1 ? " active" : ""}`}>
-                                                    <button className="page-link" onClick={() => setCurrentPage(i + 1)}>{i + 1}</button>
+                                                    <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
                                                 </li>
                                             ))}
                                             <li className={`page-item${currentPage === totalPages ? " disabled" : ""}`}>
-                                                <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>&raquo;</button>
+                                                <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
                                             </li>
                                         </ul>
                                     </nav>

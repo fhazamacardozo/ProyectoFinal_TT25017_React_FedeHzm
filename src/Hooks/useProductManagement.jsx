@@ -170,7 +170,8 @@ export const useProductManagement = (
             if (user) {
                 await logProductActivity(addedProduct || productData, user, "manual");
             }
-            await fetchProducts(); // Recargar la lista
+            // Optimistic update: add to local state
+            setAllProducts(prev => [...prev, addedProduct]);
             MySwal.fire({
                 title: "Éxito",
                 text: "Producto agregado correctamente",
@@ -197,7 +198,8 @@ export const useProductManagement = (
         setIsSaving(true);
         try {
             await updateProductInDb(id, productData);
-            await fetchProducts();
+            // Optimistic update: update in local state
+            setAllProducts(prev => prev.map(p => p.id === id ? { ...p, ...productData } : p));
             MySwal.fire({
                 title: "Éxito",
                 text: "Producto actualizado correctamente",
@@ -236,7 +238,8 @@ export const useProductManagement = (
             setIsDeletingId(id);
             try {
                 await deleteProductFromDb(id);
-                await fetchProducts();
+                // Optimistic update: remove from local state
+                setAllProducts(prev => prev.filter(p => p.id !== id));
                 MySwal.fire("¡Eliminado!", "El producto ha sido eliminado.", "success");
             } catch (error) {
                 console.error("Error al eliminar el producto:", error);

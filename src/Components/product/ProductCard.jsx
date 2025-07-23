@@ -1,9 +1,13 @@
 import { Card, Button, Spinner } from 'react-bootstrap'; 
 import styles from './ProductCard.module.css';
 
-
-
-function ProductCard({ item, buttonText, onShowDetails, onAddToCart, cartLoading }) {
+/**
+ * ProductCard: fully generic, renders product info and a list of action buttons.
+ * Props:
+ * - item: product object
+ * - actions: array of { label, onClick, isLoading, variant, icon, disabled, ... }
+ */
+function ProductCard({ item, actions }) {
     return (
         <Card className={`h-100 ${styles.customCard}`}>
             <Card.Img
@@ -20,22 +24,25 @@ function ProductCard({ item, buttonText, onShowDetails, onAddToCart, cartLoading
                 <Card.Text className={styles.category}>{item.category}</Card.Text>
                 <Card.Text className={styles.rating}>Rating: {item.rating.rate} ({item.rating.count})</Card.Text>
 
-                {buttonText && (
-                    <Button variant="primary" className="mb-2 w-100" onClick={onShowDetails}>
-                        {buttonText}
-                    </Button>
-                )}
-                {onAddToCart && (
-                    <Button variant="success" className="w-100" onClick={() => onAddToCart(item)} disabled={cartLoading}>
-                        {cartLoading ? (
-                            <>
-                                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-2" />
-                                Procesando...
-                            </>
-                        ) : (
-                            "Añadir al carrito"
-                        )}
-                    </Button>
+                {/* Generic actions array (only) */}
+                {Array.isArray(actions) && actions.length > 0 && (
+                    <div className="d-flex flex-column gap-2 mt-2">
+                        {actions.map((action, idx) => (
+                            <Button
+                                key={idx}
+                                variant={action.variant || 'primary'}
+                                className={action.className || 'w-100'}
+                                onClick={() => action.onClick && action.onClick(item)}
+                                disabled={action.disabled || action.isLoading}
+                            >
+                                {action.isLoading && (
+                                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-2" />
+                                )}
+                                {action.icon && <span className="me-2">{action.icon}</span>}
+                                {action.label}
+                            </Button>
+                        ))}
+                    </div>
                 )}
             </Card.Body>
         </Card>

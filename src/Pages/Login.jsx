@@ -72,7 +72,7 @@ function Login() {
                         Cargando...
                         </>
                     ) : (
-                        "Submit"
+                        "Iniciar Sesión"
                     )}
                 </Button>
                 {/*Register button*/}
